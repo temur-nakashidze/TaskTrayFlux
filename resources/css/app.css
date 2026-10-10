@@ -1,0 +1,149 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=Geist:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&family=Zilla+Slab:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap");
+@import "tailwindcss";
+@import "../../vendor/livewire/flux/dist/flux.css";
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
+@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --tracking-snug-wide: 0.0115em;
+    --text-base: 14px; /* 14px */
+    --font-sans: "Noto Sans Georgian", ui-sans-serif, system-ui;
+    --font-display: "Roboto Slab", sans-serif;
+    --font-mono: "Geist Mono", "Noto Sans Georgian", monospace;
+    --font-label: "Geist mono", sans-serif;
+
+    /* --color-zinc-50: #fafafa;
+    --color-zinc-100: #f5f5f5;
+    --color-zinc-200: #e5e5e5;
+    --color-zinc-300: #d4d4d4;
+    --color-zinc-400: #a3a3a3;
+    --color-zinc-500: #737373;
+    --color-zinc-600: #525252;
+    --color-zinc-700: #404040;
+    --color-zinc-800: #262626;
+    --color-zinc-900: #171717;
+    --color-zinc-950: #0a0a0a; */
+
+    --color-zinc-50: var(--color-mist-50);
+    --color-zinc-100: var(--color-mist-100);
+    --color-zinc-200: var(--color-mist-200);
+    --color-zinc-300: var(--color-mist-300);
+    --color-zinc-400: var(--color-mist-400);
+    --color-zinc-500: var(--color-mist-500);
+    --color-zinc-600: var(--color-mist-600);
+    --color-zinc-700: var(--color-mist-700);
+    --color-zinc-800: var(--color-mist-800);
+    --color-zinc-900: var(--color-mist-900);
+    --color-zinc-950: var(--color-mist-950);
+
+    --color-accent: #68659a;
+    --color-accent-content: #53517b;
+    --color-accent-foreground: var(--color-white);
+}
+
+@layer theme {
+    .dark {
+        --color-accent: #68659a;
+        --color-accent-content: #bebbdd;
+        --color-accent-foreground: var(--color-white);
+    }
+}
+
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+[data-flux-field]:not(ui-radio, ui-checkbox) {
+    @apply grid gap-2;
+}
+
+[data-flux-label] {
+    @apply !mb-0 !leading-tight;
+}
+
+input:focus[data-flux-control],
+textarea:focus[data-flux-control],
+select:focus[data-flux-control] {
+    @apply outline-hidden ring-1 ring-zinc-500/10 inset-shadow-sm border-zinc-700/30 ring-offset-0 ring-offset-accent-foreground transition-colors;
+}
+
+input[data-flux-control],
+textarea[data-flux-control],
+select[data-flux-control] {
+    @apply inset-shadow-sm inset-shadow-zinc-700/5 shadow-zinc-700/5;
+}
+
+[data-flux-button] {
+    @apply cursor-pointer font-mono!;
+}
+
+html.transitions-ready [data-flux-button] {
+    @apply transition-colors;
+}
+
+@layer components {
+    [data-flux-button] [data-flux-icon] {
+        @apply opacity-70;
+    }
+}
+
+[data-flux-toggle] {
+    @apply cursor-pointer font-mono!;
+}
+[data-flux-button]:hover [data-flux-icon] {
+    @apply opacity-100;
+}
+
+[data-flux-card-body] {
+    @apply shadow-zinc-600/5;
+}
+
+[data-flux-menu],
+[data-flux-popover] {
+    --flux-anim: 150ms;
+
+    opacity: 0;
+    translate: 0 -0.25rem;
+    scale: 0.97;
+    transform-origin: top;
+
+    transition:
+        opacity var(--flux-anim) ease-out,
+        translate var(--flux-anim) ease-out,
+        scale var(--flux-anim) ease-out,
+        display var(--flux-anim) allow-discrete,
+        overlay var(--flux-anim) allow-discrete;
+}
+
+[data-flux-menu]:popover-open,
+[data-flux-popover]:popover-open {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+}
+
+@starting-style {
+    [data-flux-menu]:popover-open,
+    [data-flux-popover]:popover-open {
+        opacity: 0;
+        translate: 0 -0.25rem;
+        scale: 0.97;
+    }
+}
+
+/* \[:where(&)\]:size-4 {
+    @apply size-4;
+} */
