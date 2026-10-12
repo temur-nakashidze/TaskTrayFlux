@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('cuts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('task_id')->constrained()->cascadeOnDelete();
-            $table->string('title');
+            $table->string('title')->nullable();
             $table->boolean('completed_at')->default(false);
             $table->unsignedInteger('position')->default(0);
             $table->timestamps();

@@ -1,28 +1,25 @@
 <div x-data="{
     open: false,
-    x: 0,
-    y: 0,
     show(e) {
-        this.x = e.clientX
-        this.y = e.clientY
+        const m = this.$refs.menu
+        if (!m.matches(':popover-open')) m.showPopover()
         this.open = true
-        this.$nextTick(() => {
-            const m = this.$refs.menu
-            this.x = Math.max(8, Math.min(this.x, window.innerWidth - m.offsetWidth - 8))
-            this.y = Math.max(8, Math.min(this.y, window.innerHeight - m.offsetHeight - 8))
-        })
+        m.style.left = Math.max(8, Math.min(e.clientX, window.innerWidth - m.offsetWidth - 8)) + 'px'
+        m.style.top = Math.max(8, Math.min(e.clientY, window.innerHeight - m.offsetHeight - 8)) + 'px'
+    },
+    close() {
+        if (!this.open) return
+        this.open = false
+        this.$refs.menu.hidePopover()
     },
 }" x-on:contextmenu.prevent="show($event)"
-    x-on:mousedown.window="if (open && !$refs.menu.contains($event.target)) open = false"
-    x-on:keydown.escape.window="open = false" x-on:scroll.window.passive="open = false" x-on:resize.window="open = false"
+    x-on:mousedown.window="if (open && !$refs.menu.contains($event.target)) close()" x-on:keydown.escape.window="close()"
+    x-on:scroll.window.passive="close()" x-on:resize.window="close()" x-on:livewire:navigating.window="close()"
     {{ $attributes }}>
     {{ $slot }}
 
-    <template x-teleport="body">
-        <div x-ref="menu" x-show="open" x-cloak x-transition.opacity.duration.100ms x-on:click="open = false"
-            x-on:contextmenu.prevent x-bind:style="`left: ${x}px; top: ${y}px`"
-            class="fixed z-50 min-w-44 rounded-lg border border-zinc-200 bg-white p-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-800">
-            {{ $menu }}
-        </div>
-    </template>
+    <div x-ref="menu" popover="manual" x-on:click="close()" x-on:contextmenu.prevent.stop
+        class="m-0 inset-auto min-w-44 overflow-visible rounded-lg border border-zinc-700/10 bg-white/80 p-1 text-zinc-800 shadow-md shadow-zinc-500/15 backdrop-blur-md dark:border-zinc-700 dark:bg-zinc-800/80 dark:text-white dark:shadow-zinc-950/10">
+        {{ $menu }}
+    </div>
 </div>

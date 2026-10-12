@@ -3,13 +3,17 @@
 namespace App\Actions\Project;
 
 use App\Models\Project;
+use App\Models\Tray;
 
 class CreateTray
 {
-    public function handle(int $projectId): void
+    public function handle(int $projectId): Tray
     {
         $project = Project::findOrFail($projectId);
 
-        $project->trays()->create();
+        $tray = $project->trays()->create();
+
+        return $tray;
+
     }
 }

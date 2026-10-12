@@ -54,6 +54,16 @@ class Tray extends Model
         return $this->hasMany(Task::class);
     }
 
+    public function completedTasks(): HasMany
+    {
+        return $this->hasMany(Task::class)->whereNotNull('completed_at');
+    }
+
+    public function activeTasks(): HasMany
+    {
+        return $this->hasMany(Task::class)->whereNull('completed_at');
+    }
+
     /**
      * Workbench-pull references placed in this Tray. Only populated when
      * the Tray belongs to a Workbench.

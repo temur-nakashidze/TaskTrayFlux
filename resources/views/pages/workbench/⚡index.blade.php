@@ -1,12 +1,12 @@
 <?php
 
+use App\Actions\Task\RestoreTask;
 use App\Actions\TimeTracking\PauseTaskTimer;
 use App\Actions\TimeTracking\StartTaskTimer;
 use App\Actions\Workbench\ClearCompletedTasks;
-use App\Actions\Workbench\CompleteTask;
+use App\Actions\Workbench\CompleteWorkbenchTask;
 use App\Actions\Workbench\RemoveTaskFromActive;
 use App\Actions\Workbench\RemoveTaskFromWorkbench;
-use App\Actions\Workbench\RestoreTask;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
@@ -117,7 +117,7 @@ new class extends Component
 
     public function completeTask(WorkbenchTask $workbenchTask)
     {
-        app(CompleteTask::class)->handle($workbenchTask->task, $this->user);
+        app(CompleteWorkbenchTask::class)->handle($workbenchTask->task, $this->user);
         $this->dispatch('timer-changed');
     }
 
@@ -148,6 +148,9 @@ new class extends Component
         $this->dispatch('workbench-updated');
         $this->dispatch('timer-changed');
     }
+
+    #[On('project-updated')]
+    public function refresh() {}
 };
 ?>
 

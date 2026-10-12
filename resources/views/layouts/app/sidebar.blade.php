@@ -6,10 +6,9 @@
 </head>
 
 <body class="min-h-screen bg-zinc-100 dark:bg-zinc-900">
-    <flux:sidebar sticky>
+    <flux:sidebar class="w-76 bg-zinc-100" style="view-transition-name: sidebar" sticky>
         <flux:sidebar.header>
             <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
-            {{-- <flux:sidebar.collapse /> --}}
         </flux:sidebar.header>
 
         <livewire:sidebar.projects-list />

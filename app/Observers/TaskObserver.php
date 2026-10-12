@@ -23,7 +23,8 @@ class TaskObserver
     public function deleting(Task $task): void
     {
         $task->cuts()->get()->each(fn ($cut) => $cut->delete());
-        $task->workbenchReference()->get()->each(fn ($wt) => $wt->delete());
+        $task->timeEntries()->delete();
+        $task->workbenchReference()?->delete();
     }
 
     public function restoring(Task $task): void

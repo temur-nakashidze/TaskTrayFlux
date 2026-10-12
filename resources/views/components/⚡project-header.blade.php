@@ -47,17 +47,20 @@ new class extends Component
 
         $this->dispatch('project-updated');
     }
+
+    #[On('project-updated')]
+    public function refresh(): void {}
 };
 ?>
 
 <div>
     <flux:card variant="filled" class="mb-4 border  rounded-lg pl-6 py-1 pr-1">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-4">
             <x-ui.input-ghost wire:key="project-name-{{ $project->id }}" :value="$projectName" maxlength="255"
                 x-on:save="$wire.renameProject({{ $project->id }}, $event.detail)"
                 class="font-medium text-zinc-600 text-2xl font-display" />
-            <flux:spacer />
             <x-project.workbench-button :project="$project" :count="$this->workbenchTasksCount" :active="$onWorkbench" />
+            <flux:spacer />
         </div>
 
     </flux:card>

@@ -1,19 +1,28 @@
-@props(['tray'])
+@props(['tray', 'badgeColor'])
 
-<flux:card {{ $attributes->class('max-w-80 w-full max-h-full flex flex-col shrink-0 group/tray') }} :highlight="true"
+<flux:card {{ $attributes->class('max-w-84 w-full max-h-full flex flex-col shrink-0 ') }} :highlight="true"
     variant="soft" body="inset" size="sm">
-
-    <flux:card.header class="shrink-0">
+    <flux:card.header class="shrink-0 group/tray">
         <div class="flex items-center gap-2">
             <flux:icon.grip-vertical wire:sort:handle variant="mini"
                 class="opacity-20 group-hover/tray:opacity-80 transition-opacity cursor-grab text-zinc-500 -ml-3" />
-            <x-ui.input-ghost wire:key="tray-name-{{ $tray->id }}" :value="$tray->name" maxlength="255"
-                x-on:save="$wire.renameTray({{ $tray->id }}, $event.detail)"
-                class="font-medium text-zinc-600 text-xl font-mono" />
+            <div class="flex items-center gap-4">
+                <x-ui.input-ghost wire:key="tray-name-{{ $tray->id }}" focus-on="tray-added" :focus-id="$tray->id"
+                    :value="$tray->name" maxlength="255" x-on:save="$wire.renameTray({{ $tray->id }}, $event.detail)"
+                    class="font-medium text-zinc-600 text-xl font-mono" />
+                <flux:badge color="{{ $badgeColor }}">{{ $tray->active_tasks_count }}</flux:badge>
+            </div>
         </div>
         <flux:card.actions>
-            <flux:badge color="primary">{{ $tray->tasks_count }}</flux:badge>
-            <flux:button icon="x-mark" wire:click="deleteTray({{ $tray->id }})" />
+            <flux:dropdown>
+                <flux:button icon="ellipsis-horizontal" variant="subtle"></flux:button>
+                <flux:menu>
+                    <flux:menu.item icon="archive-box">open Archive</flux:menu.item>
+                    <flux:menu.item variant="danger" wire:click="confirmDelete('tray', {{ $tray->id }})"
+                        icon="trash">Delete
+                    </flux:menu.item>
+                </flux:menu>
+            </flux:dropdown>
         </flux:card.actions>
     </flux:card.header>
 
@@ -27,11 +36,19 @@
         </x-ui.bump-textarea>
     </form>
 
-    <div wire:sort="moveTask" wire:sort:group="tray" wire:sort:group-id="{{ $tray->id }}"
-        class="space-y-1 flex-1 min-h-0 overflow-y-auto overscroll-contain px-1 -mx-1">
-        @foreach ($tray->tasks as $task)
-            <x-project.task :task="$task" wire:transition wire:key="task-{{ $task->id }}"
-                wire:sort:item="{{ $task->id }}" />
-        @endforeach
-    </div>
+    {{ $slot }}
+    @if ($tray->completed_tasks_count > 0)
+        <flux:card.footer class="px-0" x-data="{ showCompleted: false }">
+
+            <flux:button x-on:click="showCompleted = !showCompleted" size="xs" variant="subtle"
+                class="flex items-center justify-start gap-2" icon="chevron-down">
+                Completed {{ $tray->completed_tasks_count }}
+            </flux:button>
+            <div wire:sort="moveTask" wire:sort:group="tray" x-cloak x-show="showCompleted" class="space-y-2 mt-2"
+                x-collapse>
+                {{ $completed }}
+            </div>
+
+        </flux:card.footer>
+    @endif
 </flux:card>

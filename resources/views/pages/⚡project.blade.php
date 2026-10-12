@@ -2,8 +2,12 @@
 
 use App\Actions\Project\CreateTray;
 use App\Actions\Project\RemoveTray;
+use App\Actions\Task\CompleteTask;
+use App\Actions\task\DeleteCut;
+use App\Actions\Task\DeleteTask;
+use App\Actions\Task\RestoreTask;
+use App\Actions\Tray\DeleteTray;
 use App\Actions\Workbench\RemoveTaskFromWorkbench;
-use App\Concerns\Ui\WithHeader;
 use App\Livewire\Concerns\WithWorkbenchPulling;
 use App\Models\Cut;
 use App\Models\Project;
@@ -19,13 +23,40 @@ use Livewire\Component;
 
 new class extends Component
 {
-    use WithHeader, WithWorkbenchPulling;
+    use WithWorkbenchPulling;
 
     public Project $project;
 
     public array $trayNames = [];
 
     public array $taskTitles = [];
+
+    public string $deletingMessage = 'Are you Shure To delete?';
+
+    public string $deletingDesc = 'Are you Shure To delete?';
+
+    protected array $deletableRecords = [
+        'task' => [
+            'model' => Task::class,
+            'action' => DeleteTask::class,
+        ],
+        'tray' => [
+            'model' => Tray::class,
+            'action' => DeleteTray::class,
+        ],
+        'cut' => [
+            'model' => Cut::class,
+            'action' => DeleteCut::class,
+        ],
+    ];
+
+    public ?int $deletingId = null;
+
+    public string $deletingType = '';
+
+    public ?int $selectedTask = null;
+
+    public ?string $taskNote = null;
 
     public function mount(Project $project): void
     {
@@ -39,14 +70,18 @@ new class extends Component
     }
 
     #[Computed]
-    #[On('tray-created')]
     public function trays()
     {
         return $this->project
             ->trays()
-            ->ordered()
-            ->with(['tasks' => fn ($q) => $q->ordered()->with('cuts', 'tags')])
-            ->withCount('tasks')
+            ->ordered('asc')
+            ->with([
+                'tasks' => fn ($q) => $q->ordered()->with('cuts', 'tags'),
+                'completedTasks' => fn ($q) => $q->ordered()->with('cuts', 'tags'),
+                'activeTasks' => fn ($q) => $q->ordered()->with('cuts', 'tags'),
+            ])
+            ->withCount('activeTasks')
+            ->withCount('completedTasks')
             ->get();
     }
 
@@ -75,7 +110,7 @@ new class extends Component
     public function moveTray(int $id, int $position): void
     {
         $tray = Tray::findOrFail($id);
-        $tray->moveToPosition($position);
+        $tray->moveToPosition($position, 'asc');
     }
 
     #[Renderless]
@@ -90,6 +125,21 @@ new class extends Component
         Task::whereHas('tray', fn ($q) => $q->inProject($this->project))
             ->findOrFail($taskId)
             ->update(['title' => $title]);
+    }
+
+    public function redactingNote(Task $task)
+    {
+        $this->selectedTask = $task->id;
+        $this->taskNote = $task->note;
+        $this->modal('update-note')->show();
+    }
+
+    public function updateNote()
+    {
+        $task = Task::findOrFail($this->selectedTask);
+        $note = $this->taskNote;
+        $task->update(['note' => $note]);
+        $this->modal('update-note')->close();
     }
 
     #[Renderless]
@@ -132,14 +182,14 @@ new class extends Component
 
     public function addTray()
     {
-        app(CreateTray::class)->handle($this->project->id);
+        $tray = app(CreateTray::class)->handle($this->project->id);
         $this->dispatch('trays-updated');
+        $this->dispatch('tray-added', id: $tray->id);
     }
 
-    public function deleteTray(int $trayId)
+    public function addCut(Task $task)
     {
-        app(RemoveTray::class)->handle($trayId);
-        $this->dispatch('trays-updated');
+        $task->cuts()->create();
     }
 
     #[Renderless]
@@ -156,10 +206,56 @@ new class extends Component
             ->update(['title' => $title]);
     }
 
-    // A task was dropped in the sidebar: an empty listener is enough, the component re-renders.
+    public function confirmDelete(string $type, int $id)
+    {
+        if (! array_key_exists($type, $this->deletableRecords)) {
+            abort(403, 'Invalid entity Type');
+        }
+
+        $this->deletingId = $id;
+        $this->deletingType = $type;
+
+        $this->modal('delete-record')->show();
+    }
+
+    public function delete()
+    {
+        if (! array_key_exists($this->deletingType, $this->deletableRecords)) {
+            abort(403, 'Invalid entity Type');
+        }
+
+        $entity = $this->deletableRecords[$this->deletingType];
+
+        $record = $entity['model']::findOrFail($this->deletingId);
+
+        $this->modal('delete-record')->close();
+        app($entity['action'])->handle($record);
+        // Reset state and close modal
+        $this->reset(['deletingId', 'deletingType']);
+        $this->dispatch('timer-changed');
+    }
+
+    public function deleteTask(Task $task)
+    {
+        app(DeleteTask::class)->handle($task);
+    }
+
+    public function completeTask(Task $task)
+    {
+        app(CompleteTask::class)->handle($task, auth()->user());
+    }
+
+    public function restoreTask(Task $task)
+    {
+        app(RestoreTask::class)->handle($task);
+    }
+
     #[On('tasks-moved')]
     #[On('sidebar-reordered')]
-    public function refreshAfterMove(): void {}
+    #[On('tray-created')]
+    #[On('tray-deleted')]
+    #[On('project-updated')]
+    public function refresh(): void {}
 };
 ?>
 
@@ -168,13 +264,91 @@ new class extends Component
     <livewire:project-header :project="$this->project" />
 
 
-    <x-ui.pan-board wire:sort="moveTray" x-sort:group="trays" class="w-full h-[calc(100vh-9rem)] pb-2">
+    <flux:button wire:click="addTray" icon="plus" size="sm" variant="filled" class="shrink-0 mb-4" />
+    <x-ui.pan-board wire:sort="moveTray" x-sort:group="trays" class="w-full h-[calc(100vh-9rem)] pb-2 pin-board">
 
-        <flux:button wire:click="addTray" icon="plus" size="sm" variant="filled" class="shrink-0 mb-4" />
 
         @foreach ($this->trays as $tray)
             <x-project.tray :tray="$tray" wire:transition wire:key="tray-{{ $tray->id }}"
-                x-sort:item="{{ $tray->id }}" />
+                x-sort:item="{{ $tray->id }}" badgeColor="{{ $project->color }}">
+                <div wire:sort="moveTask" wire:sort:group="tray" wire:sort:group-id="{{ $tray->id }}"
+                    class="space-y-1 flex-1 min-h-0 overflow-y-auto overscroll-contain px-1 -mx-1">
+                    @foreach ($tray->activeTasks as $task)
+                        <x-project.task :task="$task" toggleColor="{{ $project->color }}" wire:transition
+                            wire:key="active-task-{{ $task->id }}" :tags="$task->tags"
+                            wire:sort:item="{{ $task->id }}">
+                            <x-slot:actions>
+                                <flux:button.group>
+                                    <flux:button variant="filled" wire:click="completeTask({{ $task->id }})"
+                                        icon="check" size="sm" />
+                                    <flux:toggle icon="wrench" size="sm" class="rounded-l-none" variant="filled"
+                                        icon="wrench-screwdriver" color="{{ $project->color }}"
+                                        x-on:change="$wire.toggleWorkbenchTask({{ $task->id }})"
+                                        :checked="$task->workbenchReference" />
+                                </flux:button.group>
+                            </x-slot:actions>
+                        </x-project.task>
+                    @endforeach
+                    <x-slot:completed>
+                        @foreach ($tray->completedTasks as $task)
+                            <x-project.task :task="$task" toggleColor="{{ $project->color }}" completed
+                                wire:transition wire:key="completed-task-{{ $task->id }}" :tags="$task->tags"
+                                wire:sort:item="{{ $task->id }}"
+                                class="border border-zink-600! rounded-md bg-white/50 opacity-60" :context="true">
+                                <x-slot:actions>
+                                    <flux:button variant="filled" icon="arrow-uturn-up"
+                                        x-on:click="$wire.restoreTask({{ $task->id }})" iconVariant="outline"
+                                        size="sm" />
+                                </x-slot:actions>
+                            </x-project.task>
+                        @endforeach
+                    </x-slot:completed>
+                </div>
+            </x-project.tray>
         @endforeach
     </x-ui.pan-board>
+
+
+    <flux:modal name="delete-record" class="min-w-[22rem]">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">{{ $deletingMessage }}</flux:heading>
+
+                <flux:text class="mt-2">
+                    {{ $deletingDesc }}<br>
+                </flux:text>
+            </div>
+
+            <div class="flex gap-2">
+                <flux:spacer />
+
+                <flux:modal.close>
+                    <flux:button variant="ghost">Cancel</flux:button>
+                </flux:modal.close>
+
+                <flux:button type="submit" variant="danger" wire:click="delete">Delete</flux:button>
+            </div>
+        </div>
+    </flux:modal>
+    <flux:modal name="update-note" class="min-w-100">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Add Note</flux:heading>
+            </div>
+
+            <flux:textarea spellcheck="false" rows="8" autofocus label="Task note" wire:model="taskNote">
+            </flux:textarea>
+            <div class="flex gap-2">
+                <flux:spacer />
+
+                <flux:modal.close>
+                    <flux:button variant="ghost">Cancel</flux:button>
+                </flux:modal.close>
+
+                <flux:button type="submit" variant="danger" wire:click="updateNote()">Save
+                </flux:button>
+            </div>
+        </div>
+    </flux:modal>
+
 </div>

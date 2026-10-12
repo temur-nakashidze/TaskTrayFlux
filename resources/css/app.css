@@ -10,7 +10,12 @@
 @source '../../vendor/livewire/flux/stubs/**/*.blade.php';
 
 @custom-variant dark (&:where(.dark, .dark *));
-
+:root {
+    --board-bg: var(--color-zinc-50);
+}
+.dark {
+    --board-bg: var(--color-zinc-900);
+}
 @theme {
     --tracking-snug-wide: 0.0115em;
     --text-base: 14px; /* 14px */
@@ -93,6 +98,9 @@ select[data-flux-control] {
 html.transitions-ready [data-flux-button] {
     @apply transition-colors;
 }
+html.transitions-ready [data-flux-button] [data-flux-icon] {
+    @apply transition-opacity;
+}
 
 @layer components {
     [data-flux-button] [data-flux-icon] {
@@ -143,7 +151,24 @@ html.transitions-ready [data-flux-button] {
         scale: 0.97;
     }
 }
+.sidebar {
+    view-transition-name: sidebar;
+    z-index: 70;
+    position: sticky; /* or fixed/sticky, whatever it already is */
+}
 
+.pan-board {
+    view-transition-name: board;
+    view-transition-group: contain;
+}
+
+.pan-board > * {
+    view-transition-group: nearest;
+}
+
+::view-transition-group(board) {
+    overflow: clip;
+}
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
