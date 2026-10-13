@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Concerns\HasPosition;
+use App\Enums\ProjectColor;
 use App\Observers\ProjectObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -36,6 +37,7 @@ class Project extends Model
     {
         return [
             'position' => 'integer',
+            'color' => ProjectColor::class,
         ];
     }
 

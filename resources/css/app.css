@@ -1,6 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@100..900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=Geist:ital,wght@0,100..900;1,100..900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&family=Zilla+Slab:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Spline+Sans+Mono:ital,wght@0,300..700;1,300..700&display=swap");
 @import "tailwindcss";
 @import "../../vendor/livewire/flux/dist/flux.css";
 
@@ -19,10 +18,9 @@
 @theme {
     --tracking-snug-wide: 0.0115em;
     --text-base: 14px; /* 14px */
-    --font-sans: "Noto Sans Georgian", ui-sans-serif, system-ui;
-    --font-display: "Roboto Slab", sans-serif;
-    --font-mono: "Geist Mono", "Noto Sans Georgian", monospace;
-    --font-label: "Geist mono", sans-serif;
+    --font-display: "JetBrains Mono", ui-sans-serif, system-ui, sans-serif;
+    --font-sans: "Geist Mono", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
     /* --color-zinc-50: #fafafa;
     --color-zinc-100: #f5f5f5;
@@ -48,16 +46,16 @@
     --color-zinc-900: var(--color-mist-900);
     --color-zinc-950: var(--color-mist-950);
 
-    --color-accent: #68659a;
-    --color-accent-content: #53517b;
-    --color-accent-foreground: var(--color-white);
+    --color-accent: #61616b;
+    --color-accent-content: #494950;
+    --color-accent-foreground: #f2f2f3;
 }
 
 @layer theme {
     .dark {
-        --color-accent: #68659a;
-        --color-accent-content: #bebbdd;
-        --color-accent-foreground: var(--color-white);
+        --color-accent: #c9c9cf;
+        --color-accent-content: #494950;
+        --color-accent-foreground: #494950;
     }
 }
 
@@ -108,9 +106,9 @@ html.transitions-ready [data-flux-button] [data-flux-icon] {
     }
 }
 
-[data-flux-toggle] {
+/* [data-flux-toggle] {
     @apply cursor-pointer font-mono!;
-}
+} */
 [data-flux-button]:hover [data-flux-icon] {
     @apply opacity-100;
 }
@@ -143,6 +141,10 @@ html.transitions-ready [data-flux-button] [data-flux-icon] {
     scale: 1;
 }
 
+[data-flux-modal] dialog {
+    @apply backdrop:bg-zinc-900/30 dark:backdrop:bg-black/50 backdrop:backdrop-blur-xs;
+}
+
 @starting-style {
     [data-flux-menu]:popover-open,
     [data-flux-popover]:popover-open {
@@ -155,6 +157,11 @@ html.transitions-ready [data-flux-button] [data-flux-icon] {
     view-transition-name: sidebar;
     z-index: 70;
     position: sticky; /* or fixed/sticky, whatever it already is */
+}
+
+/* the clone that follows the cursor */
+.sortable-fallback {
+    @apply opacity-100! shadow-xl ring-1 ring-black/10 cursor-grabbing rotate-1 scale-[1.02] bg-white dark:bg-zinc-800;
 }
 
 .pan-board {

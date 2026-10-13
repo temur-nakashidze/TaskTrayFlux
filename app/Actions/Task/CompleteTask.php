@@ -6,6 +6,7 @@ use App\Actions\TimeTracking\PauseTaskTimer;
 use App\Actions\Workbench\FoldTimeEntriesIntoDuration;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 final class CompleteTask
 {
@@ -13,17 +14,27 @@ final class CompleteTask
 
     public function handle(Task $task, User $user): Task
     {
-        if ($task->runningTimeEntry) {
-            app(PauseTaskTimer::class)->handle($user);
-            $task->refresh();
-        }
-        $this->fold->handle($task);
-        $task->workbenchTask?->delete();
 
-        $task->update([
-            'completed_at' => now(),
-        ]);
+        return DB::transaction(function () use ($task, $user) {
 
-        return $task->refresh();
+            if ($task->runningTimeEntry) {
+                app(PauseTaskTimer::class)->handle($user);
+                $task->refresh();
+            }
+            $this->fold->handle($task);
+            $task->workbenchTask?->delete();
+
+            $now = now();
+
+            $task->cuts()->whereNull('completed_at')
+                ->update(['completed_at' => $now]);
+
+            $task->update([
+                'completed_at' => $now,
+            ]);
+
+            return $task;
+        });
+
     }
 }

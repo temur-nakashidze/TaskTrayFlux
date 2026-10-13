@@ -2,10 +2,9 @@
 
 namespace App\Actions\Task;
 
-use App\Contracts\DeletesRecord;
 use App\Models\Cut;
 
-class DeleteCut implements DeletesRecord
+class DeleteCut
 {
     public function handle(Cut $cut)
     {

@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('task_id')->constrained()->cascadeOnDelete();
             $table->string('title')->nullable();
-            $table->boolean('completed_at')->default(false);
+            $table->timestamp('completed_at')->nullable();
             $table->unsignedInteger('position')->default(0);
             $table->timestamps();
             $table->softDeletes();

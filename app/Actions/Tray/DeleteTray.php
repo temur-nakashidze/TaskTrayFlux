@@ -2,10 +2,9 @@
 
 namespace App\Actions\Tray;
 
-use App\Contracts\DeletesRecord;
 use App\Models\Tray;
 
-class DeleteTray implements DeletesRecord
+class DeleteTray
 {
     public function handle(Tray $tray)
     {

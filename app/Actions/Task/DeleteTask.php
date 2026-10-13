@@ -2,10 +2,9 @@
 
 namespace App\Actions\Task;
 
-use App\Contracts\DeletesRecord;
 use App\Models\Task;
 
-class DeleteTask implements DeletesRecord
+class DeleteTask
 {
     public function handle(Task $task)
     {

@@ -1,5 +1,13 @@
 @props(['task', 'toggleColor', 'tags', 'actions' => null, 'completed' => false, 'context' => null])
-<flux:card.body {{ $attributes->merge(['class' => 'group/task relative py-3!']) }} data-task-card>
+
+<flux:card.body
+    {{ $attributes->merge([
+        'class' => Arr::toCssClasses([
+            'group/task relative py-3!',
+            'border  rounded-md bg-white/70 opacity-70' => $completed,
+        ]),
+    ]) }}
+    data-task-card>
 
     <x-ui.context-menu>
         <x-slot:menu>
@@ -11,31 +19,45 @@
                 danger>Delete</x-ui.context-menu.item>
         </x-slot:menu>
 
-        <div class="flex items-start justify-between">
+        <div class="flex items-start justify-between relative">
             <flux:icon.grip-vertical wire:sort:handle variant="micro"
                 class="opacity-15 group-hover/task:opacity-60 transition-opacity cursor-grab text-zinc-500 mt-2 -ml-1" />
 
             <x-ui.textarea-ghost :value="$task->title" x-on:save="$wire.renameTask({{ $task->id }}, $event.detail)"
-                class="mt-1.5 ml-0.5 mr-1" />
+                :class="Arr::toCssClasses(['mt-1.5 ml-0.5 mr-1', 'line-through' => $completed])" />
+
             @if ($actions)
                 <div class="flex items-center gap-2">
+                    @if ($task->note)
+                        <flux:button variant="subtle" size="xs" icon="notebook-text"
+                            x-on:click="$wire.redactingNote({{ $task->id }})" />
+                    @endif
                     {{ $actions }}
                 </div>
             @endif
         </div>
     </x-ui.context-menu>
     @if ($task->cuts->isNotEmpty())
-        <div x-sort class="space-y-1 mt-2">
+        <div wire:sort="moveCut" class="space-y-1 mt-2">
             @foreach ($task->cuts as $cut)
-                <flux:card x-sort:item="{{ $cut->id }}" wire:key="cut-{{ $cut->id }}" size="xs"
+                @php
+                    $cutCompleted = $cut->completed_at == !null;
+                @endphp
+                <flux:card wire:sort:item="{{ $cut->id }}" wire:key="cut-{{ $cut->id }}" size="xs"
                     variant="soft" class="p-1.5 rounded-sm group/cut">
                     <div class="flex items-start gap-1">
                         <flux:icon.grip-vertical wire:sort:handle variant="micro"
                             class="opacity-15 group-hover/cut:opacity-80 transition-opacity cursor-grab text-zinc-500 mt-1" />
-                        <x-ui.textarea-ghost autofocus :value="$cut->title" class="text-zinc-500! mt-0.5"
+                        <x-ui.textarea-ghost :value="$cut->title" :class="Arr::toCssClasses(['text-zinc-500! mt-0.5', 'line-through' => $cutCompleted])"
                             x-on:save="$wire.renameCut({{ $cut->id }}, $event.detail)" />
-                        @if (!$completed)
-                            <flux:button icon="check" variant="filled" class="shrink-0" size="xs" />
+
+                        @if (!$cutCompleted && !$completed)
+                            <flux:button icon="check" x-on:click="$wire.completeCut({{ $cut->id }})"
+                                variant="filled" class="shrink-0" size="xs" />
+                        @endif
+                        @if (!$completed && $cutCompleted)
+                            <flux:button icon="arrow-uturn-up" x-on:click="$wire.restoreCut({{ $cut->id }})"
+                                variant="filled" class="shrink-0" size="xs" />
                         @endif
                     </div>
                 </flux:card>
@@ -52,11 +74,6 @@
                         </flux:badge>
                     @endforeach
                 </div>
-            @endif
-            <flux:spacer />
-            @if ($task->note)
-                <flux:button variant="subtle" size="xs" icon="notebook-text"
-                    x-on:click="$wire.redactingNote({{ $task->id }})" />
             @endif
         </div>
     @endif

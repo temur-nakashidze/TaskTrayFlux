@@ -1,8 +1,8 @@
 @props(['project', 'count' => 0, 'active' => false, 'time' => null])
 
 @php
-    $buttonVariant = $active ? 'outline' : 'filled';
-    $badgeVariant = $active ? '' : 'solid';
+    $buttonVariant = $active ? 'filled' : 'outline';
+    $badgeVariant = $active ? 'solid' : '';
     $buttonClass = $active ? 'pointer-events-none' : '';
 @endphp
 
@@ -15,7 +15,7 @@
         </flux:button>
 
         @if ($active)
-            <flux:button variant="outline" color="{{ $project->color }}" wire:click="$dispatch('close-workbench')"
+            <flux:button variant="filled" color="{{ $project->color }}" wire:click="$dispatch('close-workbench')"
                 aria-label="Close workbench" icon="x-mark">
             </flux:button>
         @endif

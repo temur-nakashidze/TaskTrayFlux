@@ -37,7 +37,7 @@
 }" x-init="isEmpty = !$refs.textarea.value.trim();
 if (!isEmpty) resize();
 Livewire.hook('commit', ({ succeed }) => succeed(() => $nextTick(() => resize())));"
-    class="relative bg-zinc-600/5 dark:bg-zinc-900/30 rounded-md pt-2 pb-1.5">
+    class="relative bg-zinc-600/5 dark:bg-zinc-900/30 rounded-sm pt-2 pb-1.5">
 
 
 

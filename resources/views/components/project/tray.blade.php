@@ -17,7 +17,11 @@
             <flux:dropdown>
                 <flux:button icon="ellipsis-horizontal" variant="subtle"></flux:button>
                 <flux:menu>
-                    <flux:menu.item icon="archive-box">open Archive</flux:menu.item>
+
+                    <flux:menu.item wire:click="$dispatch('open-tray-trash', { trayId: {{ $tray->id }}})"
+                        icon="archive-box">open
+                        Trash
+                    </flux:menu.item>
                     <flux:menu.item variant="danger" wire:click="confirmDelete('tray', {{ $tray->id }})"
                         icon="trash">Delete
                     </flux:menu.item>
@@ -38,7 +42,7 @@
 
     {{ $slot }}
     @if ($tray->completed_tasks_count > 0)
-        <flux:card.footer class="px-0" x-data="{ showCompleted: false }">
+        <flux:card.footer class="px-0 overflow-y-auto overflow-x-hidden overscroll-contain" x-data="{ showCompleted: false }">
 
             <flux:button x-on:click="showCompleted = !showCompleted" size="xs" variant="subtle"
                 class="flex items-center justify-start gap-2" icon="chevron-down">

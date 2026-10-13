@@ -54,14 +54,15 @@ new class extends Component
 ?>
 
 <div>
-    <flux:card variant="filled" class="mb-4 border  rounded-lg pl-6 py-1 pr-1">
-        <div class="flex items-center gap-4">
-            <x-ui.input-ghost wire:key="project-name-{{ $project->id }}" :value="$projectName" maxlength="255"
-                x-on:save="$wire.renameProject({{ $project->id }}, $event.detail)"
-                class="font-medium text-zinc-600 text-2xl font-display" />
-            <x-project.workbench-button :project="$project" :count="$this->workbenchTasksCount" :active="$onWorkbench" />
-            <flux:spacer />
-        </div>
+    <flux:card variant="filled" class="mb-4 border  rounded-lg pl-6 py-1 pr-1 flex items-center gap-4">
+
+        <x-ui.input-ghost wire:key="project-name-{{ $project->id }}" :value="$projectName" maxlength="255"
+            x-on:save="$wire.renameProject({{ $project->id }}, $event.detail)"
+            class="font-medium text-accent-content text-2xl font-display" />
+        <flux:spacer />
+        <flux:button icon="rotate-ccw-clock" variant="subtle" wire:click="$dispatch('open-project-log')" />
+        <x-project.workbench-button :project="$project" :count="$this->workbenchTasksCount" :active="$onWorkbench" />
+
 
     </flux:card>
 </div>
