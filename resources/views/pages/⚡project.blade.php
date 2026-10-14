@@ -275,6 +275,12 @@ new class extends Component
         $this->modal('update-note')->close();
     }
 
+    public function render()
+    {
+        return $this->view()
+            ->title($this->project->name);
+    }
+
     #[On('tasks-moved')]
     #[On('sidebar-reordered')]
     #[On('tray-created')]

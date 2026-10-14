@@ -9,7 +9,7 @@
             <div class="flex items-center gap-4">
                 <x-ui.input-ghost wire:key="tray-name-{{ $tray->id }}" focus-on="tray-added" :focus-id="$tray->id"
                     :value="$tray->name" maxlength="255" x-on:save="$wire.renameTray({{ $tray->id }}, $event.detail)"
-                    class="font-medium text-zinc-600 text-xl font-mono" />
+                    class="font-bold text-accent text-xl font-display" />
                 <flux:badge color="{{ $badgeColor }}">{{ $tray->active_tasks_count }}</flux:badge>
             </div>
         </div>

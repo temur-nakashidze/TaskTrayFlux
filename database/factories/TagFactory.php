@@ -15,7 +15,7 @@ class TagFactory extends Factory
     // whichever preset palette names your component system exposes).
     protected array $colors = [
         'primary', 'sky', 'emerald', 'amber',
-        'rose', 'violet', 'slate', 'cyan', 'orange',
+        'rose', 'violet', 'cyan', 'orange',
     ];
 
     public function definition(): array

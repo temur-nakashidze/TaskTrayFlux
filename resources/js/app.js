@@ -1,3 +1,4 @@
+import "./task-router.js";
 const html = document.documentElement;
 const body = document.body;
 

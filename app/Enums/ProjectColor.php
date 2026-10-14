@@ -78,6 +78,39 @@ enum ProjectColor: string
         return $this->styles()['toggleBorder'];
     }
 
+    /** Text color for the row icon, for dropdown rows (icons use currentColor). */
+    public function tint(): string
+    {
+        return match ($this) {
+            self::Red => 'text-red-500',
+            self::Orange => 'text-orange-500',
+            self::Amber => 'text-amber-500',
+            self::Yellow => 'text-yellow-500',
+            self::Lime => 'text-lime-500',
+            self::Green => 'text-green-500',
+            self::Emerald => 'text-emerald-500',
+            self::Teal => 'text-teal-500',
+            self::Cyan => 'text-cyan-500',
+            self::Sky => 'text-sky-500',
+            self::Blue => 'text-blue-500',
+            self::Indigo => 'text-indigo-500',
+            self::Violet => 'text-violet-500',
+            self::Purple => 'text-purple-500',
+            self::Fuchsia => 'text-fuchsia-500',
+            self::Pink => 'text-pink-500',
+            self::Rose => 'text-rose-500',
+            self::Slate => 'text-slate-400',
+            self::Gray => 'text-gray-400',
+            self::Zinc => 'text-zinc-400',
+            self::Neutral => 'text-neutral-400',
+            self::Stone => 'text-stone-400',
+            self::Mauve => 'text-mauve-400',
+            self::Olive => 'text-olive-400',
+            self::Mist => 'text-mist-400',
+            self::Taupe => 'text-taupe-400',
+        };
+    }
+
     /** @return array{bg: string, border: string, text: string, subBorder: string, toggleBorder: string} */
     private function styles(): array
     {

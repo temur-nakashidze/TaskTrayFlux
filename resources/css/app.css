@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Spline+Sans+Mono:ital,wght@0,300..700;1,300..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 @import "tailwindcss";
 @import "../../vendor/livewire/flux/dist/flux.css";
 
@@ -7,6 +8,11 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
 @source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+
+@font-face {
+    font-family: "Monolisa";
+    src: url("/resources/fonts/MonoLisa-normal.ttf") format("truetype");
+}
 
 @custom-variant dark (&:where(.dark, .dark *));
 :root {
@@ -18,8 +24,8 @@
 @theme {
     --tracking-snug-wide: 0.0115em;
     --text-base: 14px; /* 14px */
-    --font-display: "JetBrains Mono", ui-sans-serif, system-ui, sans-serif;
-    --font-sans: "Geist Mono", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Monolisa", ui-sans-serif, system-ui, sans-serif;
+    --font-sans: "JetBrains Mono", ui-sans-serif, system-ui, sans-serif;
     --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
     /* --color-zinc-50: #fafafa;
@@ -47,7 +53,7 @@
     --color-zinc-950: var(--color-mist-950);
 
     --color-accent: #61616b;
-    --color-accent-content: #494950;
+    --color-accent-content: #61616b;
     --color-accent-foreground: #f2f2f3;
 }
 
@@ -102,7 +108,7 @@ html.transitions-ready [data-flux-button] [data-flux-icon] {
 
 @layer components {
     [data-flux-button] [data-flux-icon] {
-        @apply opacity-70;
+        @apply opacity-90;
     }
 }
 

@@ -10,6 +10,7 @@
 ])
 
 @php
+
     $initial = $open ?? $current ? 'true' : 'false';
     $hasContent = $slot->isNotEmpty();
 
@@ -36,8 +37,9 @@
             @if ($context)
                 <x-ui.context-menu>
             @endif
+            @php($color = $project->color ?? \App\Enums\ProjectColor::Zinc)
             <flux:sidebar.item :href="$href" :current="$current" :badgeColor="$badgeColor" wire:navigate draggable="false"
-                x-on:click="{{ $hasContent ? 'open = true' : '' }}" class="font-display!">
+                x-on:click="{{ $hasContent ? 'open = true' : '' }}" class="font-display! ">
                 @isset($badge)
                     <x-slot:badge>{{ $badge }}</x-slot:badge>
                 @endisset
