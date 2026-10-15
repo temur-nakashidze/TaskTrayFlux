@@ -7,9 +7,26 @@ const fuzzy = (q, s) => {
     return i === q.length;
 };
 
+// exact slug first, then fuzzy; blank text never matches
+const findNamed = (list, text) => {
+    const t = text.toLowerCase();
+    if (!t) return null;
+    return (
+        list.find((x) => slug(x.name) === t) ??
+        list.find((x) => fuzzy(t, x.name)) ??
+        null
+    );
+};
+
+// second level: the project's shelves and its own trays
 const dests = (p) => [
+    ...(p.shelves ?? []).map((s) => ({
+        kind: "shelf",
+        tint: p.tint,
+        id: s.id,
+        name: s.name,
+    })),
     ...p.trays.map((t) => ({ kind: "tray", tint: p.tint, ...t })),
-    // ...p.shelves.map((s) => ({ kind: 'shelf', ...s })), // later
 ];
 
 document.addEventListener("alpine:init", () => {
@@ -42,37 +59,36 @@ document.addEventListener("alpine:init", () => {
                 return this.$root.querySelector("textarea");
             },
 
-            // ---- route mode (@) ----
-            get parts() {
-                const i = this.query.indexOf("/");
-                return i < 0
-                    ? { p: this.query, d: "", deep: false }
-                    : {
-                          p: this.query.slice(0, i),
-                          d: this.query.slice(i + 1),
-                          deep: true,
-                      };
+            // ---- route mode (@project/shelf/tray) ----
+            get segs() {
+                return this.query.split("/");
             },
 
-            findProject(p) {
-                p = p.toLowerCase();
-                return (
-                    this.projects.find((x) => slug(x.name) === p) ??
-                    this.projects.find((x) => fuzzy(p, x.name)) ??
-                    null
-                );
+            // 0 = typing the project, 1 = shelf or tray, 2 = tray of a shelf
+            get depth() {
+                return this.segs.length - 1;
             },
 
             get project() {
-                return this.parts.deep ? this.findProject(this.parts.p) : null;
+                return this.depth >= 1
+                    ? findNamed(this.projects, this.segs[0])
+                    : null;
+            },
+
+            get shelf() {
+                return this.depth >= 2 && this.project
+                    ? findNamed(this.project.shelves ?? [], this.segs[1])
+                    : null;
             },
 
             get routeLabel() {
                 if (!this.route) return "";
+                const { project, shelf, dest } = this.route;
                 return (
                     "→ " +
-                    this.route.project.name +
-                    (this.route.dest ? " / " + this.route.dest.name : "")
+                    [project.name, shelf?.name, dest?.name]
+                        .filter(Boolean)
+                        .join(" / ")
                 );
             },
 
@@ -93,13 +109,12 @@ document.addEventListener("alpine:init", () => {
                     taken.has(q) ||
                     this.tags.some((t) => t.name.toLowerCase() === q);
                 if (q && !exists)
-                    if (q && !exists)
-                        list.push({
-                            kind: "new-tag",
-                            id: "new",
-                            name: this.query,
-                            tint: "bg-zinc-400",
-                        });
+                    list.push({
+                        kind: "new-tag",
+                        id: "new",
+                        name: this.query,
+                        tint: "text-zinc-400",
+                    });
                 return list;
             },
 
@@ -111,15 +126,28 @@ document.addEventListener("alpine:init", () => {
             get items() {
                 if (this.current === "tag") return this.tagItems;
 
-                const { p, d, deep } = this.parts;
-                if (!deep) {
+                const [a, b = "", c = ""] = this.segs;
+
+                if (this.depth === 0) {
                     return this.projects
-                        .filter((x) => fuzzy(p, x.name))
+                        .filter((x) => fuzzy(a, x.name))
                         .map((x) => ({ kind: "project", ...x }));
                 }
-                return this.project
-                    ? dests(this.project).filter((x) => fuzzy(d, x.name))
-                    : [];
+                if (!this.project) return [];
+
+                if (this.depth === 1) {
+                    return dests(this.project).filter((x) => fuzzy(b, x.name));
+                }
+                if (this.depth === 2 && this.shelf) {
+                    return this.shelf.trays
+                        .map((t) => ({
+                            kind: "tray",
+                            tint: this.project.tint,
+                            ...t,
+                        }))
+                        .filter((x) => fuzzy(c, x.name));
+                }
+                return [];
             },
 
             // ---- text handling ----
@@ -172,22 +200,43 @@ document.addEventListener("alpine:init", () => {
                     return;
                 }
 
+                // projects and shelves drill one level deeper: the popup stays open
                 if (item.kind === "project") {
-                    this.replaceToken("@" + slug(item.name) + "/"); // input event re-runs detect: popup moves to the destination level
+                    this.replaceToken("@" + slug(item.name) + "/");
+                    return;
+                }
+                if (item.kind === "shelf") {
+                    this.replaceToken(
+                        "@" +
+                            slug(this.project.name) +
+                            "/" +
+                            slug(item.name) +
+                            "/",
+                    );
                     return;
                 }
 
-                this.route = { project: this.project, dest: item };
+                // a tray ends the path
+                this.route = {
+                    project: this.project,
+                    shelf: this.shelf,
+                    dest: item,
+                };
                 this.replaceToken("");
                 this.open = false;
             },
 
-            acceptProjectOnly() {
+            // Esc: keep what is resolved so far (project, or project and shelf)
+            acceptCurrent() {
                 if (!this.project) {
                     this.open = false;
                     return;
                 }
-                this.route = { project: this.project, dest: null };
+                this.route = {
+                    project: this.project,
+                    shelf: this.shelf,
+                    dest: null,
+                };
                 this.replaceToken("");
                 this.open = false;
             },
@@ -228,8 +277,8 @@ document.addEventListener("alpine:init", () => {
                         this.open = false;
                         if (e.key === "Enter") this.submit();
                     }
-                } else if (this.current === "route" && this.parts.deep)
-                    this.acceptProjectOnly();
+                } else if (this.current === "route" && this.depth > 0)
+                    this.acceptCurrent();
                 else this.open = false;
             },
 
@@ -241,8 +290,8 @@ document.addEventListener("alpine:init", () => {
                 this.$dispatch("task-submit", {
                     title,
                     projectId: this.route?.project.id ?? null,
-                    kind: this.route?.dest?.kind ?? null,
-                    destId: this.route?.dest?.id ?? null,
+                    shelfId: this.route?.shelf?.id ?? null,
+                    trayId: this.route?.dest?.id ?? null,
                     tags: this.chosen.map(({ id, name }) => ({ id, name })),
                 });
 

@@ -107,13 +107,6 @@ document.addEventListener("alpine:init", () => {
             this.panning = false;
         },
 
-        wheel(e) {
-            if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return; // already horizontal
-            if (this.insideVerticalScroller(e.target)) return; // let task lists scroll
-            e.preventDefault();
-            this.$el.scrollLeft += e.deltaY;
-        },
-
         insideVerticalScroller(el) {
             for (; el && el !== this.$el; el = el.parentElement) {
                 const scrollable =

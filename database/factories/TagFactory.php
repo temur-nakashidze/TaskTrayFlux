@@ -14,7 +14,7 @@ class TagFactory extends Factory
     // Tailwind color tokens (e.g. your primary/accent variables plus
     // whichever preset palette names your component system exposes).
     protected array $colors = [
-        'primary', 'sky', 'emerald', 'amber',
+        'sky', 'emerald', 'amber',
         'rose', 'violet', 'cyan', 'orange',
     ];
 

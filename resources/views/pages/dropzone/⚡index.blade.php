@@ -1,5 +1,6 @@
 <?php
 
+use App\Concerns\Livewire\Tasks\AddsRoutedTasks;
 use App\Enums\ProjectColor;
 use App\Enums\TagColor;
 use App\Models\Task;
@@ -8,17 +9,27 @@ use Livewire\Component;
 
 new class extends Component
 {
+    use AddsRoutedTasks;
+
     #[Computed]
     public function routes(): array
     {
         return auth()->user()->projects()
-            ->with(['trays' => fn ($q) => $q->ordered('asc')])
+            ->with([
+                'trays' => fn ($q) => $q->ordered('asc'),
+                'shelves' => fn ($q) => $q->ordered('asc')->with(['trays' => fn ($q) => $q->ordered('asc')]),
+            ])
             ->get()
             ->map(fn ($p) => [
                 'id' => $p->id,
                 'name' => $p->name,
                 'tint' => ($p->color ?? ProjectColor::Cyan)->tint(),
                 'trays' => $p->trays->map->only('id', 'name')->values(),
+                'shelves' => $p->shelves->map(fn ($s) => [
+                    'id' => $s->id,
+                    'name' => $s->name,
+                    'trays' => $s->trays->map->only('id', 'name')->values(),
+                ])->values(),
             ])
             ->values()
             ->all();
@@ -35,53 +46,6 @@ new class extends Component
                 'chip' => ($t->color ?? TagColor::Default)->chip(),
             ])
             ->all();
-    }
-
-    public function addRoutedTask(string $title, ?int $projectId, ?string $kind, ?int $destId): void
-    {
-        $title = mb_substr(trim($title), 0, 255);
-
-        if ($title === '') {
-            return;
-        }
-
-        if ($projectId === null) {
-            // no route: your existing inbox behavior
-            return;
-        }
-
-        $project = auth()->user()->projects()->findOrFail($projectId);
-
-        // if ($kind === 'shelf') { ... } // later
-
-        $tray = $kind === 'tray' ? $project->trays()->findOrFail($destId) : $project->trays()->ordered('asc')->firstOrFail();
-
-        $tray->tasks()->create([
-            'title' => $title,
-            'user_id' => auth()->id(),
-            'project_id' => $project->id,
-        ]);
-
-        $this->dispatch('tasks-moved');
-    }
-
-    private function attachTags(Task $task, array $tags): void
-    {
-        $user = auth()->user();
-
-        // existing tags: re-checked against the user's own tags
-        $ids = $user->tags()->whereKey(collect($tags)->pluck('id')->filter()->all())->pluck('id');
-
-        // new tags, or tags picked from the local list after being created
-        foreach (collect($tags)->whereNull('id')->pluck('name') as $name) {
-            $name = mb_substr(trim($name), 0, 50);
-
-            if ($name !== '') {
-                $ids->push($user->tags()->firstOrCreate(['name' => $name])->id);
-            }
-        }
-
-        $task->tags()->syncWithoutDetaching($ids->unique()->all());
     }
 
     public function render()

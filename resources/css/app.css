@@ -171,7 +171,6 @@ html.transitions-ready [data-flux-button] [data-flux-icon] {
 }
 
 .pan-board {
-    view-transition-name: board;
     view-transition-group: contain;
 }
 
@@ -179,7 +178,8 @@ html.transitions-ready [data-flux-button] [data-flux-icon] {
     view-transition-group: nearest;
 }
 
-::view-transition-group(board) {
+::view-transition-group(shelves),
+::view-transition-group(trays) {
     overflow: clip;
 }
 /* \[:where(&)\]:size-4 {

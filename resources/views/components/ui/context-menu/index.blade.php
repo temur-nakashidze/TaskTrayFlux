@@ -15,7 +15,7 @@
 }" x-on:contextmenu.prevent="show($event)"
     x-on:mousedown.window="if (open && !$refs.menu.contains($event.target)) close()" x-on:keydown.escape.window="close()"
     x-on:scroll.window.passive="close()" x-on:resize.window="close()" x-on:livewire:navigating.window="close()"
-    {{ $attributes }}>
+    {{ $attributes->merge(['class' => 'group']) }}>
     {{ $slot }}
 
     <div x-ref="menu" popover="manual" x-on:click="close()" x-on:contextmenu.prevent.stop

@@ -12,7 +12,7 @@
     </flux:card.header>
     <div wire:sort="moveTask" class="space-y-1">
         @foreach ($this->unplayedTasks as $unplayedTask)
-            <x-project.task :task="$unplayedTask->task"wire:transition wire:key="unplayed-task-{{ $unplayedTask->id }}"
+            <x-project.task :task="$unplayedTask->task" wire:transition wire:key="unplayed-task-{{ $unplayedTask->id }}"
                 :tags="$unplayedTask->task->tags" wire:sort:item="{{ $unplayedTask->id }}">
                 <x-slot:actions>
                     <flux:button.group>

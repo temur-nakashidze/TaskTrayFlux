@@ -11,7 +11,7 @@
     </flux:card.header>
     <div class="mb-4">
         <x-ui.task-router :routes="$this->routes" :tags="$this->tagOptions"
-            x-on:task-submit="$wire.addRoutedTask($event.detail.title, $event.detail.projectId, $event.detail.kind, $event.detail.destId)">
+            x-on:task-submit="$dispatch('add-routed-task', $event.detail)">
             <x-ui.bump-textarea wire:key="task-textarea-dropzone" rows="1" class="pl-4! pr-7! rounded-xl!"
                 resize="none">
                 <x-slot:placeholder>

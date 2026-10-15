@@ -54,7 +54,7 @@ new class extends Component
 ?>
 
 <div>
-    <flux:card variant="filled" class="mb-4 border  rounded-md pl-6 py-1 pr-1 flex items-center gap-4">
+    <div class="mb-4 py-1 pr-1 flex items-center gap-4">
 
         <x-ui.input-ghost wire:key="project-name-{{ $project->id }}" :value="$projectName" maxlength="255"
             x-on:save="$wire.renameProject({{ $project->id }}, $event.detail)"
@@ -64,5 +64,5 @@ new class extends Component
         <x-project.workbench-button :project="$project" :count="$this->workbenchTasksCount" :active="$onWorkbench" />
 
 
-    </flux:card>
+    </div>
 </div>

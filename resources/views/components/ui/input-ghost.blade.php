@@ -20,4 +20,4 @@
             $dispatch('save', v)
         }
     "
-    {{ $attributes->class('field-sizing-content min-w-16 max-w-full bg-transparent border-none outline-none! ring-0 rounded px-1 -mx-1') }} />
+    {{ $attributes->class('field-sizing-content min-w-16 max-w-full bg-transparent border-none outline-none! ring-0 rounded px-1 ') }} />

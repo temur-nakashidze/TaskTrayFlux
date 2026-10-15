@@ -9,7 +9,7 @@
             <div class="flex items-center gap-4">
                 <x-ui.input-ghost wire:key="tray-name-{{ $tray->id }}" focus-on="tray-added" :focus-id="$tray->id"
                     :value="$tray->name" maxlength="255" x-on:save="$wire.renameTray({{ $tray->id }}, $event.detail)"
-                    class="font-bold text-accent text-xl font-display" />
+                    class="font-semibold text-accent text-xl font-display" />
                 <flux:badge color="{{ $badgeColor }}">{{ $tray->active_tasks_count }}</flux:badge>
             </div>
         </div>
@@ -22,24 +22,24 @@
                         icon="archive-box">open
                         Trash
                     </flux:menu.item>
-                    <flux:menu.item variant="danger" wire:click="confirmDelete('tray', {{ $tray->id }})"
-                        icon="trash">Delete
+                    <flux:menu.item variant="danger" wire:click="deleteTray({{ $tray->id }})" icon="trash">Delete
                     </flux:menu.item>
                 </flux:menu>
             </flux:dropdown>
         </flux:card.actions>
     </flux:card.header>
-
-    <form wire:submit="addTask({{ $tray->id }})" class="mb-4 shrink-0">
-        <x-ui.bump-textarea wire:key="task-textarea-{{ $tray->id }}" wire:model="taskTitles.{{ $tray->id }}"
-            rows="1" class="pl-4! pr-7!" resize="none">
-            <x-slot:placeholder>
-                <flux:icon name="plus" variant="micro" class="text-zinc-400" />
-                <flux:text class="font-medium" variant="subtle">Add Task</flux:text>
-            </x-slot:placeholder>
-        </x-ui.bump-textarea>
-    </form>
-
+    <div class="mb-4">
+        <x-ui.task-router :tags="$this->tagOptions"
+            x-on:task-submit="$wire.addTask({{ $tray->id }}, $event.detail.title, $event.detail.tags)">
+            <x-ui.bump-textarea wire:key="task-textarea-tray-{{ $tray->id }}" rows="1"
+                class="pl-4! pr-7! rounded-xl!" resize="none">
+                <x-slot:placeholder>
+                    <flux:icon name="plus" variant="micro" class="text-zinc-400" />
+                    <flux:text class="font-medium" variant="subtle">Add Task</flux:text>
+                </x-slot:placeholder>
+            </x-ui.bump-textarea>
+        </x-ui.task-router>
+    </div>
     {{ $slot }}
     @if ($tray->completed_tasks_count > 0)
         <flux:card.footer class="px-0 overflow-y-auto overflow-x-hidden overscroll-contain" x-data="{ showCompleted: false }">
@@ -48,8 +48,8 @@
                 class="flex items-center justify-start gap-2" icon="chevron-down">
                 Completed {{ $tray->completed_tasks_count }}
             </flux:button>
-            <div wire:sort="moveTask" wire:sort:group="tray" x-cloak x-show="showCompleted" class="space-y-2 mt-2"
-                x-collapse>
+            <div wire:sort="moveTask" x-cloak wire:sort:group="tray" x-cloak x-show="showCompleted"
+                class="space-y-2 mt-2" x-collapse>
                 {{ $completed }}
             </div>
 

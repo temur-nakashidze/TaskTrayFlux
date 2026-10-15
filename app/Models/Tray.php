@@ -41,7 +41,7 @@ class Tray extends Model
     }
 
     /**
-     * The Project or Workbench this Tray belongs to.
+     * The Project or Shelf this Tray belongs to.
      */
     public function trayable(): MorphTo
     {

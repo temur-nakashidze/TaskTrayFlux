@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use App\Concerns\HasPosition;
+use App\Contracts\HasTrays;
 use App\Enums\ProjectColor;
 use App\Observers\ProjectObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,10 +18,9 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use LogicException;
 
-#[Table('projects')]
 #[Fillable(['user_id', 'name', 'icon', 'color', 'position'])]
 #[ObservedBy([ProjectObserver::class])]
-class Project extends Model
+class Project extends Model implements HasTrays
 {
     use HasFactory;
     use HasPosition;
@@ -39,6 +38,16 @@ class Project extends Model
             'position' => 'integer',
             'color' => ProjectColor::class,
         ];
+    }
+
+    public function owningProject(): Project
+    {
+        return $this;
+    }
+
+    public function shelves(): HasMany
+    {
+        return $this->hasMany(Shelf::class);
     }
 
     public function user(): BelongsTo

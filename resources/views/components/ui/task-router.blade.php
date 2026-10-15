@@ -19,6 +19,7 @@
                 <span class="inline-flex shrink-0" :class="item.tint">
                     <flux:icon.panels-top-left x-show="item.kind === 'project'" variant="micro" class="size-4" />
                     <flux:icon.inbox x-show="item.kind === 'tray'" variant="micro" class="size-4" />
+                    <flux:icon.user x-show="item.kind === 'shelf'" variant="micro" class="size-4" />
                     <flux:icon.tag x-show="item.kind === 'tag' || item.kind === 'new-tag'" variant="micro"
                         class="size-4" />
                 </span>
@@ -34,7 +35,7 @@
         <div x-show="route || chosen.length" x-cloak
             class="mt-1 flex flex-wrap items-center gap-1.5 font-mono text-xs text-zinc-500">
             <span x-show="route" class="inline-flex items-center gap-1.5">
-                <span class="size-2 rounded-full" :class="route?.project.dot"></span>
+                <span class="size-2 rounded-full" :class="route?.project.tint"></span>
                 <span x-text="routeLabel"></span>
             </span>
             <template x-for="(t, i) in chosen" :key="t.name">

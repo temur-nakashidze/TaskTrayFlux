@@ -155,7 +155,7 @@ new class extends Component
 ?>
 
 <div>
-    <livewire:project-header :project="$this->project" />
+    <livewire:project.project-header :project="$this->project" />
     <div class="w-full h-[calc(100vh-12rem)] pb-4 grid grid-cols-2 gap-8">
         <div class="flex flex-col gap-8 h-full">
             @include('pages/workbench/started-tasks')
