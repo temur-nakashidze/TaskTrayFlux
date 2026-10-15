@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TagColor;
 use App\Observers\TagObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -19,6 +20,11 @@ class Tag extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    protected function casts(): array
+    {
+        return ['color' => TagColor::class];
+    }
 
     public function user(): BelongsTo
     {

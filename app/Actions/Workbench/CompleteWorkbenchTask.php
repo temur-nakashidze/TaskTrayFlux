@@ -6,7 +6,7 @@ use App\Actions\TimeTracking\PauseTaskTimer;
 use App\Models\Task;
 use App\Models\User;
 
-final class CompleteTask
+final class CompleteWorkbenchTask
 {
     public function handle(Task $task, User $user): Task
     {

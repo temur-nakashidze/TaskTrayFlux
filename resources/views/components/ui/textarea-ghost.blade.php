@@ -1,14 +1,14 @@
 @props(['value' => ''])
 
-<textarea rows="1" x-data="{
+<textarea spellcheck="false" rows="1" x-data="{
     original: @js($value),
     resize() {
         if (CSS.supports('field-sizing', 'content')) return
         $el.style.height = 'auto'
         $el.style.height = $el.scrollHeight + 'px'
     },
-}" x-init="resize()" x-on:input="resize()" x-on:resize.window="resize()"
-    x-on:keydown.enter="if ($event.shiftKey) return; $event.preventDefault(); $el.blur()"
+}" x-init="resize()" x-on:input="resize()"
+    x-on:resize.window="resize()" x-on:keydown.enter="if ($event.shiftKey) return; $event.preventDefault(); $el.blur()"
     x-on:keydown.escape="$el.value = original; resize(); $el.blur()"
     x-on:blur="
         const v = $el.value.trim()

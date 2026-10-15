@@ -1,3 +1,4 @@
+import "./task-router.js";
 const html = document.documentElement;
 const body = document.body;
 
@@ -104,13 +105,6 @@ document.addEventListener("alpine:init", () => {
 
         up() {
             this.panning = false;
-        },
-
-        wheel(e) {
-            if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return; // already horizontal
-            if (this.insideVerticalScroller(e.target)) return; // let task lists scroll
-            e.preventDefault();
-            this.$el.scrollLeft += e.deltaY;
         },
 
         insideVerticalScroller(el) {

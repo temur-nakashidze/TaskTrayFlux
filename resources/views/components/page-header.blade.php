@@ -9,8 +9,8 @@
          @endif --}}
 
      <div class="relative">
-         <flux:heading x-show="!editing" x-transition size="2xl" class="{{ $color }}! capitalize text-nowrap"
-             weight="semibold">
+         <flux:heading x-show="!editing" x-transition size="2xl"
+             class="{{ $color }}! capitalize text-nowrap font-bold">
              {{ $title }}
          </flux:heading>
          @if ($editable)

@@ -41,7 +41,7 @@ class Tray extends Model
     }
 
     /**
-     * The Project or Workbench this Tray belongs to.
+     * The Project or Shelf this Tray belongs to.
      */
     public function trayable(): MorphTo
     {
@@ -52,6 +52,16 @@ class Tray extends Model
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
+    }
+
+    public function completedTasks(): HasMany
+    {
+        return $this->hasMany(Task::class)->whereNotNull('completed_at');
+    }
+
+    public function activeTasks(): HasMany
+    {
+        return $this->hasMany(Task::class)->whereNull('completed_at');
     }
 
     /**

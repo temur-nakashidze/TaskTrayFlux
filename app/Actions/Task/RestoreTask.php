@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions\Workbench;
+namespace App\Actions\Task;
 
 use App\Models\Task;
 

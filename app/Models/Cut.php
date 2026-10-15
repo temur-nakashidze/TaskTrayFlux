@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Concerns\HasPosition;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Cut extends Model
 {
     use HasFactory;
+    use HasPosition;
     use SoftDeletes;
 
     protected function casts(): array

@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Attributes\UseModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,14 +23,14 @@ class ProjectFactory extends Factory
     // Tailwind color tokens (e.g. your primary/accent variables plus
     // whichever preset palette names your component system exposes).
     protected array $colors = [
-        'primary', 'accent', 'sky', 'emerald', 'amber',
-        'rose', 'violet', 'slate', 'cyan', 'orange',
+        'sky', 'emerald', 'amber',
+        'rose', 'violet', 'cyan', 'orange',
     ];
 
     public function definition(): array
     {
         return [
-            'user_id' => \App\Models\User::factory(),
+            'user_id' => User::factory(),
             'name' => ucfirst(fake()->words(2, true)),
             'icon' => fake()->randomElement($this->icons),
             'color' => fake()->randomElement($this->colors),

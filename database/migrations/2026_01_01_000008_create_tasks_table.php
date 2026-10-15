@@ -25,6 +25,11 @@ return new class extends Migration
                 ->nullable()
                 ->constrained()
                 ->nullOnDelete();
+            $table
+                ->foreignId('shelf_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
             $table->text('title');
             $table->text('note')->nullable();
             $table->timestamp('completed_at')->nullable();

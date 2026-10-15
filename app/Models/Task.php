@@ -107,15 +107,6 @@ class Task extends Model
     }
 
     /**
-     * Whether this task is allowed to be marked complete right now, i.e.
-     * it has no incomplete Cuts. Enforced for real in TaskObserver::saving().
-     */
-    public function canBeCompleted(): bool
-    {
-        return $this->cuts()->where('completed_at', null)->doesntExist();
-    }
-
-    /**
      * Tasks with no project at all - the Dropzone view.
      */
     #[Scope]

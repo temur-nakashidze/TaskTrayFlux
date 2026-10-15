@@ -39,14 +39,16 @@ trait HasPosition
             ->orderBy($this->getQualifiedKeyName(), $direction);
     }
 
-    public function moveToPosition(int $position): static
+    public function moveToPosition(int $position, string $direction = 'desc'): static
     {
-        $this->getConnection()->transaction(function () use ($position) {
+        $direction = strtolower($direction) === 'asc' ? 'asc' : 'desc';
+
+        $this->getConnection()->transaction(function () use ($position, $direction) {
             $column = $this->getPositionColumn();
 
-            // id => stored position, in current order, for the whole group (self included).
+            // id => stored position, in the SAME order the UI displays.
             $current = $this->newPositionQuery()
-                ->ordered()
+                ->ordered($direction)
                 ->lockForUpdate()
                 ->pluck($column, $this->getKeyName())
                 ->all();
@@ -62,13 +64,19 @@ trait HasPosition
 
             array_splice($ids, $index, 0, [$this->getKey()]);
 
-            // ordered() is DESC, therefore the visually first item
-            // must receive the highest position.
-            $positions = array_reverse($ids);
+            if ($direction === 'desc') {
+                // visually first item must receive the highest position
+                $positions = array_reverse($ids);
+                $newOwn = count($ids) - 1 - $index;
+            } else {
+                // visually first item receives position 0
+                $positions = $ids;
+                $newOwn = $index;
+            }
 
             $this->writePositions($positions, $current);
 
-            $this->setAttribute($column, count($ids) - 1 - $index);
+            $this->setAttribute($column, $newOwn);
             $this->syncOriginalAttribute($column);
         });
 

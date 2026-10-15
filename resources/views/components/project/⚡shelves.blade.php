@@ -1,0 +1,70 @@
+<?php
+
+use App\Actions\Shelf\CreateShelf;
+use App\Models\Project;
+use App\Models\Shelf;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\Locked;
+use Livewire\Attributes\Renderless;
+use Livewire\Component;
+
+new class extends Component
+{
+    #[Locked]
+    public Project $project;
+
+    #[Computed]
+    public function shelves()
+    {
+        return $this->project->shelves()->ordered('asc')->get();
+    }
+
+    public function addShelf(CreateShelf $action): void
+    {
+        $shelf = $action->handle($this->project);
+
+        $this->dispatch('shelf-added', id: $shelf->id);
+    }
+
+    #[Renderless]
+    public function renameShelf(int $shelfId, string $value): void
+    {
+        $name = mb_substr(trim($value), 0, 255);
+
+        if ($name !== '') {
+            $this->project
+                ->shelves()
+                ->findOrFail($shelfId)
+                ->update(['name' => $name]);
+        }
+    }
+
+    #[Renderless]
+    public function moveShelf(int $id, int $position): void
+    {
+        $this->project->shelves()->findOrFail($id)->moveToPosition($position, 'asc');
+    }
+
+    public function deleteShelf(Shelf $shelf)
+    {
+        $shelf->delete();
+    }
+};
+?>
+
+<div>
+    <flux:card size="sm" variant="filled" class="flex items-center gap-2 mb-4">
+        <flux:heading class="text-accent font-bold! font-display" size="xl">Shelves</flux:heading>
+        <flux:spacer />
+        <flux:button icon="archive-box" size="sm" variant="filled" />
+        <flux:button wire:click="addShelf" icon="plus" size="sm" variant="filled">Add Shelf</flux:button>
+    </flux:card>
+    <x-ui.pan-board name="shelves" wire:sort="moveShelf" wire:transition wire:sort:group="shelves" class="w-full pb-2"
+        scroll-on="shelf-added">
+
+        @foreach ($this->shelves as $shelf)
+            <x-project.shelf wire:sort:item="{{ $shelf->id }}" :color="$this->project->color->value" :shelf="$shelf"
+                wire:key="shelves-shelf-{{ $shelf->id }}"></x-project.shelf>
+        @endforeach
+    </x-ui.pan-board>
+</div>
