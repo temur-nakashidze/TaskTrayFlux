@@ -6,8 +6,6 @@
             </flux:card.heading>
         </div>
         <flux:card.actions>
-            <flux:badge color="{{ $project->color }}">12
-            </flux:badge>
         </flux:card.actions>
     </flux:card.header>
     <div wire:sort="moveTask" class="space-y-1">

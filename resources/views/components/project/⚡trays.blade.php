@@ -1,22 +1,26 @@
 <?php
 
 use App\Actions\Task\CreateTask;
+use App\Actions\Workbench\RemoveTaskFromWorkbench;
 use App\Contracts\HasTrays;
 use App\Enums\TagColor;
 use App\Livewire\Concerns\ManagesTrays;
 use App\Livewire\Concerns\Tasks\ManagesTasks;
+use App\Livewire\Concerns\WithWorkbenchPulling;
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\Renderless;
 use Livewire\Component;
 
 new class extends Component
 {
     use ManagesTasks;
     use ManagesTrays;
+    use WithWorkbenchPulling;
 
     #[Locked]
     public Model $owner;
@@ -35,6 +39,11 @@ new class extends Component
     protected function taskScope(): Builder
     {
         return $this->owner->tasks()->getQuery();
+    }
+
+    protected function pullableTasks(): Builder
+    {
+        return $this->project->tasks()->notOnWorkbench()->getQuery();
     }
 
     #[Computed]
@@ -89,14 +98,35 @@ new class extends Component
     #[Computed]
     public function tagOptions(): array
     {
-        return auth()->user()->tags()->orderBy('name')->get(['id', 'name', 'color'])
-            ->map(fn ($t) => [
-                'id' => $t->id,
-                'name' => $t->name,
-                'tint' => ($t->color ?? TagColor::Default)->tint(),
-                'chip' => ($t->color ?? TagColor::Default)->chip(),
-            ])
+        return auth()
+            ->user()
+            ->tags()
+            ->orderBy('name')
+            ->get(['id', 'name', 'color'])
+            ->map(
+                fn ($t) => [
+                    'id' => $t->id,
+                    'name' => $t->name,
+                    'tint' => ($t->color ?? TagColor::Default)->tint(),
+                    'chip' => ($t->color ?? TagColor::Default)->chip(),
+                ],
+            )
             ->all();
+    }
+
+    public function removeTaskFromWorkbench(int $taskId): void
+    {
+        $task = Task::findOrFail($taskId);
+        app(RemoveTaskFromWorkbench::class)->handle($task->id);
+        $this->dispatch('workbench-updated');
+    }
+
+    #[Renderless]
+    public function toggleWorkbenchTask(int $taskId): void
+    {
+        $task = $this->project->tasks()->findOrFail($taskId);
+
+        $task->workbenchReference ? $this->removeTaskFromWorkbench($taskId) : $this->pullToWorkbench($task->id, $this->project->workbench->id);
     }
 
     // #[On('tasks-moved')]
@@ -110,13 +140,13 @@ new class extends Component
 ?>
 
 <div>
-    <flux:card size="sm" variant="filled" class="flex items-center gap-2 mb-4 p-2">
-        <flux:heading class="text-accent font-bold! pl-2" size="xl">Trays</flux:heading>
+    <div class="flex items-center gap-2 mb-4">
+        <flux:heading class="text-zinc-600/80 font-semibold! font-display" size="lg">Trays</flux:heading>
         <flux:spacer />
-        <flux:button icon="archive-box" variant="filled" />
-        <flux:button wire:click="addTray" icon="plus" variant="filled">Add Tray</flux:button>
+        <flux:button icon="archive-box" variant="filled" size="sm" />
+        <flux:button wire:click="addTray" icon="plus" size="sm" variant="filled">Add Tray</flux:button>
+    </div>
 
-    </flux:card>
     <x-ui.pan-board name="trays" wire:sort="moveTray" wire:transition wire:sort:group="trays"
         class="w-full h-[calc(100vh-12rem)] pb-2" scroll-on="tray-added">
 

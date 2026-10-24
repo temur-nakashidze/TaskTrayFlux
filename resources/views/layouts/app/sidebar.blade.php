@@ -6,10 +6,10 @@
 </head>
 
 <body class="min-h-screen bg-zinc-100 dark:bg-zinc-900">
-    <flux:sidebar class="w-74 bg-zinc-100" style="view-transition-name: sidebar" sticky>
-        <flux:sidebar.header>
+    <flux:sidebar class="w-73 bg-zinc-100" style="view-transition-name: sidebar" sticky>
+        <div class="border-b border-zinc-200/50 -mx-4 py-4 -mt-4 px-4">
             <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
-        </flux:sidebar.header>
+        </div>
 
         <flux:input as="button" variant="filled" icon="magnifying-glass" kbd="⌘P" />
         <livewire:sidebar.projects-list />

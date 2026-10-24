@@ -1,15 +1,15 @@
 @props(['tray', 'badgeColor'])
 
-<flux:card {{ $attributes->class('max-w-84 w-full max-h-full flex flex-col shrink-0 ') }} :highlight="true"
-    variant="soft" body="inset" size="sm">
+<flux:card {{ $attributes->class('max-w-84 w-full max-h-full flex flex-col shrink-0 bg-white/20! p-3') }}
+    :highlight="true" variant="soft" body="inset" size="sm">
     <flux:card.header class="shrink-0 group/tray">
         <div class="flex items-center gap-2">
-            <flux:icon.grip-vertical wire:sort:handle variant="mini"
+            <flux:icon.grip-vertical wire:sort:handle variant="micro"
                 class="opacity-20 group-hover/tray:opacity-80 transition-opacity cursor-grab text-zinc-500 -ml-3" />
             <div class="flex items-center gap-4">
                 <x-ui.input-ghost wire:key="tray-name-{{ $tray->id }}" focus-on="tray-added" :focus-id="$tray->id"
                     :value="$tray->name" maxlength="255" x-on:save="$wire.renameTray({{ $tray->id }}, $event.detail)"
-                    class="font-semibold text-accent text-xl font-display" />
+                    class="font-medium text-zinc-600! text-xl font-display" />
                 <flux:badge color="{{ $badgeColor }}">{{ $tray->active_tasks_count }}</flux:badge>
             </div>
         </div>

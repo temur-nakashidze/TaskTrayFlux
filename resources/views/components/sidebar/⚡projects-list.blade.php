@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\Project\CreateBlueprint;
 use App\Actions\Project\CreateProject;
 use App\Actions\Project\DeleteProject;
 use App\Actions\Project\UpdateProject;
@@ -157,6 +158,11 @@ new class extends Component
         $this->modal('delete-project')->close();
     }
 
+    public function addBlueprint(Project $project)
+    {
+        app(CreateBlueprint::class)->handle($project);
+    }
+
     // Refresh when the board changed something relevant
     #[On('workbench-updated')]
     #[On('board-reordered')]
@@ -194,6 +200,10 @@ new class extends Component
                             {{ $project->name }}
                         </x-slot:label>
                         <x-slot:context-menu>
+                            <x-ui.context-menu.item icon="square-dashed-text"
+                                wire:click="addBlueprint({{ $project->id }})">
+                                Create Blueprint
+                            </x-ui.context-menu.item>
                             <x-ui.context-menu.item icon="pencil" wire:click="setProject({{ $project->id }})">
                                 Edit
                             </x-ui.context-menu.item>
@@ -210,7 +220,11 @@ new class extends Component
                                 {{ $project->workbench_tasks_count }}
                             </div>
                         </x-slot:badge>
-
+                        @if ($project->blueprint)
+                            <a href="{{ route('blueprint', $project) }}">
+                                <div>bluepint</div>
+                            </a>
+                        @endif
 
                         {{-- tray reordering --}}
                         <div wire:sort="moveTray" wire:sort:group="sidebar-trays-{{ $project->id }}"

@@ -12,10 +12,10 @@ class ProjectObserver
      */
     public function created(Project $project): void
     {
-        $workbench = $project->workbench()->create();
+        $project->workbench()->create();
+        $project->blueprint()->create();
         $project->trays()->create([
             'name' => 'Unsorted',
-            'slug' => 'unsorted',
             'position' => 0,
         ]);
     }
@@ -28,7 +28,6 @@ class ProjectObserver
      */
     public function deleting(Project $project): void
     {
-        $project->tasks()->get()->each(fn ($task) => $task->delete());
         $project->trays()->get()->each(fn ($tray) => $tray->delete());
 
         if ($workbench = $project->workbench) {
@@ -49,22 +48,16 @@ class ProjectObserver
     public function restoring(Project $project): void
     {
         $project
-            ->tasks()
-            ->onlyTrashed()
-            ->get()
-            ->each(fn ($task) => $task->restore());
-        $project
             ->trays()
             ->onlyTrashed()
             ->get()
             ->each(fn ($tray) => $tray->restore());
 
-        if ($workbench = $project->workbench) {
-            $workbench
-                ->workbenchTasks()
-                ->onlyTrashed()
-                ->get()
-                ->each(fn ($wt) => $wt->restore());
-        }
+        $project->workbench
+            ->workbenchTasks()
+            ->onlyTrashed()
+            ->get()
+            ->each(fn ($wt) => $wt->restore());
+
     }
 }

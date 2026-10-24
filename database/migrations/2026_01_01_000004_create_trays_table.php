@@ -16,8 +16,6 @@ return new class extends Migration
             $table->string('trayable_type')->nullable();
             $table->unsignedBigInteger('trayable_id')->nullable();
             $table->string('name')->nullable();
-            $table->string('slug')->nullable();
-            $table->string('color', 30)->nullable(); // Tailwind color token (e.g. 'primary', 'accent', 'sky'), not a hex code
             $table->unsignedInteger('position')->default(0);
             $table->timestamps();
             $table->softDeletes();

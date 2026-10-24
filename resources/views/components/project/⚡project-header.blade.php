@@ -53,16 +53,12 @@ new class extends Component
 };
 ?>
 
-<div>
-    <div class="mb-4 py-1 pr-1 flex items-center gap-4">
-
-        <x-ui.input-ghost wire:key="project-name-{{ $project->id }}" :value="$projectName" maxlength="255"
-            x-on:save="$wire.renameProject({{ $project->id }}, $event.detail)"
-            class="font-bold text-accent text-2xl font-display" />
-        <flux:spacer />
-        <flux:button icon="rotate-ccw-clock" variant="subtle" wire:click="$dispatch('open-project-log')" />
-        <x-project.workbench-button :project="$project" :count="$this->workbenchTasksCount" :active="$onWorkbench" />
-
-
-    </div>
+<div
+    class="sticky top-0 z-30  bg-white/20 border-b border-zinc-200/50 mb-6 flex items-center gap-4 -mx-6 -mt-6 px-4 py-4 backdrop-blur-md">
+    <x-ui.input-ghost wire:key="project-name-{{ $project->id }}" :value="$projectName" maxlength="255"
+        x-on:save="$wire.renameProject({{ $project->id }}, $event.detail)"
+        class="font-bold! text-zinc-600 text-2xl font-display uppercase" />
+    <flux:button icon="rotate-ccw-clock" variant="subtle" wire:click="$dispatch('open-project-log')" />
+    <flux:spacer />
+    <x-project.workbench-button :project="$project" :count="$this->workbenchTasksCount" :active="$onWorkbench" />
 </div>

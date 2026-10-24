@@ -86,10 +86,6 @@ class Task extends Model
         return $this->belongsToMany(Tag::class, 'task_tag');
     }
 
-    /**
-     * Workbench pull references pointing at this task (0, or 1 active
-     * reference per workbench in practice, enforced in the app layer).
-     */
     public function workbenchReference(): HasOne
     {
         return $this->hasOne(WorkbenchTask::class);
@@ -99,6 +95,12 @@ class Task extends Model
     protected function notOnWorkbench(Builder $query): void
     {
         $query->whereDoesntHave('workbenchReference');
+    }
+
+    #[Scope]
+    protected function onWorkbench(Builder $query, Workbench $workbench): void
+    {
+        $query->whereRelation('workbenchReference', 'workbench_id', $workbench->id);
     }
 
     public function inWorkbench(): bool

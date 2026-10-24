@@ -7,17 +7,21 @@ use App\Actions\Workbench\ClearCompletedTasks;
 use App\Actions\Workbench\CompleteWorkbenchTask;
 use App\Actions\Workbench\RemoveTaskFromActive;
 use App\Actions\Workbench\RemoveTaskFromWorkbench;
+use App\Livewire\Concerns\Tasks\ManagesTasks;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
 use App\Models\Workbench;
 use App\Models\WorkbenchTask;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 new class extends Component
 {
+    use ManagesTasks;
+
     public Workbench $workbench;
 
     public Project $project;
@@ -39,6 +43,11 @@ new class extends Component
             ->with(['task', 'task.cuts', 'task.tags', 'task.timeEntries', 'task.runningTimeEntry'])
             ->ordered()
             ->get();
+    }
+
+    public function taskScope(): Builder
+    {
+        return Task::onWorkbench($this->workbench);
     }
 
     #[Computed]

@@ -1,7 +1,7 @@
 <x-ui.context-menu class="max-w-84 w-full">
     <flux:card
-        {{ $attributes->merge(['class' => ' max-h-full flex flex-col shrink-0 hover:shadow-none hover:border-accent/30 group-data-[open]:shadow-none group-data-[open]:border-accent/30  transition-colors']) }}
-        :highlight="true" body="semeless" size="sm">
+        {{ $attributes->merge(['class' => ' max-h-full flex flex-col shrink-0 hover:shadow-none hover:border-accent/30 group-data-[open]:shadow-none group-data-[open]:border-accent/30  transition-colors bg-white/40!']) }}
+        :highlight="true" variant="outline" body="semeless" size="sm">
         <a href="{{ route('shelf', [$shelf->project_id, $shelf]) }}" wire:navigate
             class="absolute inset-0 rounded-[inherit] focus-visible:outline-2 focus-visible:outline-accent"
             aria-label="Open {{ $shelf->name }}"></a>

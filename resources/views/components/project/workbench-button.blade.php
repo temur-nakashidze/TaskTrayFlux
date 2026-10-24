@@ -1,16 +1,14 @@
 @props(['project', 'count' => 0, 'active' => false, 'time' => null])
 
 @php
-    $buttonVariant = $active ? 'filled' : 'outline';
     $badgeVariant = $active ? 'solid' : '';
     $buttonClass = $active ? 'pointer-events-none' : '';
 @endphp
 
 <div class="flex items-stretch gap-1">
     <flux:button.group>
-        <flux:button href="{{ route('workbench', $project->id) }}" wire:navigate aria-label="Workbench"
-            variant="{{ $buttonVariant }}" icon="wrench-screwdriver" color="{{ $project->color }}"
-            class="{{ $buttonClass }}">Workbench
+        <flux:button href="{{ route('workbench', $project->id) }}" wire:navigate aria-label="Workbench" variant="filled"
+            icon="wrench-screwdriver" color="{{ $project->color }}" class="{{ $buttonClass }}">Workbench
             <flux:badge variant="{{ $badgeVariant }}" color="{{ $project->color }}">{{ $count }}</flux:badge>
         </flux:button>
 

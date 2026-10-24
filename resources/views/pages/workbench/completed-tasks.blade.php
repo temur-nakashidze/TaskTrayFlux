@@ -1,4 +1,4 @@
-<flux:card variant="muted" body="inset" class="h-full" size="sm">
+<flux:card variant="filled" body="inset" class="h-full" size="sm">
     <flux:card.header>
         <flux:heading size="xl" variant="muted">Done</flux:heading>
         <flux:card.actions>

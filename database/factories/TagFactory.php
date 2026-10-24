@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Tag;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Attributes\UseModel;
+use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 #[UseModel(Tag::class)]
@@ -15,7 +15,7 @@ class TagFactory extends Factory
     // whichever preset palette names your component system exposes).
     protected array $colors = [
         'sky', 'emerald', 'amber',
-        'rose', 'violet', 'cyan', 'orange',
+        'rose', 'violet', 'cyan', 'orange', 'lime',
     ];
 
     public function definition(): array

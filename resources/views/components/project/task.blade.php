@@ -30,7 +30,7 @@
                 <div class="flex items-center gap-2">
                     @if ($task->note)
                         <flux:button variant="subtle" size="xs" icon="notebook-text"
-                            x-on:click="$wire.redactingNote({{ $task->id }})" />
+                            x-on:click="$wire.redactingNote({{ $task->id }})" class="opacity-80!" />
                     @endif
                     {{ $actions }}
                 </div>

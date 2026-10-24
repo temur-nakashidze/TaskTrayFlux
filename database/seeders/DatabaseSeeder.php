@@ -10,7 +10,6 @@ use App\Models\Tray;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,34 +18,34 @@ class DatabaseSeeder extends Seeder
         $user =
             User::first() ??
             User::factory()->create([
-                "name" => "Temo",
-                "email" => "temo@example.test",
+                'name' => 'Temo',
+                'email' => 'temo@example.test',
             ]);
 
         $tags = collect([
-            "urgent",
-            "bug",
-            "idea",
-            "investigate",
-            "quick-win",
+            'urgent',
+            'bug',
+            'idea',
+            'investigate',
+            'quick-win',
         ])->map(
-            fn($name) => Tag::factory()->create([
-                "user_id" => $user->id,
-                "name" => $name,
+            fn ($name) => Tag::factory()->create([
+                'user_id' => $user->id,
+                'name' => $name,
             ]),
         );
 
         // --- Project 1: trays straight on the project, a few tasks (one with
         // Cuts, some completed), and a Workbench with pulled-in tasks ---
         $project1 = Project::factory()->create([
-            "user_id" => $user->id,
-            "position" => 0,
+            'user_id' => $user->id,
+            'position' => 0,
         ]);
 
         [$todo, $later, $ideas] = $this->trays($project1, [
-            "Todo",
-            "Later",
-            "Ideas",
+            'Todo',
+            'Later',
+            'Ideas',
         ]);
 
         $todoTasks = $this->tasks($todo, $user, 4);
@@ -59,30 +58,30 @@ class DatabaseSeeder extends Seeder
         $taskWithCuts = Task::factory()
             ->forTray($todo)
             ->create([
-                "user_id" => $user->id,
-                "title" => "Ship the auth flow",
-                "position" => 10,
+                'user_id' => $user->id,
+                'title' => 'Ship the auth flow',
+                'position' => 10,
             ]);
         Cut::factory()->create([
-            "task_id" => $taskWithCuts->id,
-            "title" => "Add login form",
-            "position" => 0,
+            'task_id' => $taskWithCuts->id,
+            'title' => 'Add login form',
+            'position' => 0,
         ]);
         Cut::factory()->create([
-            "task_id" => $taskWithCuts->id,
-            "title" => "Add password reset",
-            "position" => 1,
+            'task_id' => $taskWithCuts->id,
+            'title' => 'Add password reset',
+            'position' => 1,
         ]);
         Cut::factory()->create([
-            "task_id" => $taskWithCuts->id,
-            "title" => "Write tests",
-            "position" => 2,
+            'task_id' => $taskWithCuts->id,
+            'title' => 'Write tests',
+            'position' => 2,
         ]);
         $taskWithCuts->tags()->attach($tags->random(2));
 
         // Tag a handful of other tasks too.
         $todoTasks->each(
-            fn($t) => $t->tags()->attach($tags->random(rand(0, 2))),
+            fn ($t) => $t->tags()->attach($tags->random(rand(0, 2))),
         );
 
         // Pull a few tasks into this project's Workbench. References are
@@ -97,11 +96,11 @@ class DatabaseSeeder extends Seeder
 
         // --- Project 2: a small second project, to exercise the sidebar order ---
         $project2 = Project::factory()->create([
-            "user_id" => $user->id,
-            "position" => 1,
+            'user_id' => $user->id,
+            'position' => 1,
         ]);
 
-        [$todo2, $ideas2] = $this->trays($project2, ["Todo", "Ideas"]);
+        [$todo2, $ideas2] = $this->trays($project2, ['Todo', 'Ideas']);
         $this->tasks($todo2, $user, 3);
         $this->tasks($ideas2, $user, 2);
     }
@@ -116,12 +115,11 @@ class DatabaseSeeder extends Seeder
     {
         $trays = collect($names)
             ->map(
-                fn($name, $i) => Tray::factory()
+                fn ($name, $i) => Tray::factory()
                     ->forProject($project)
                     ->create([
-                        "name" => $name,
-                        "slug" => Str::slug($name),
-                        "position" => $i,
+                        'name' => $name,
+                        'position' => $i,
                     ]),
             )
             ->all();
@@ -131,8 +129,7 @@ class DatabaseSeeder extends Seeder
             Tray::factory()
                 ->forProject($project)
                 ->create([
-                    "name" => "Unsorted",
-                    "slug" => "unsorted",
+                    'name' => 'Unsorted',
                 ]);
 
         $unsorted->moveToPosition(PHP_INT_MAX);
@@ -145,10 +142,10 @@ class DatabaseSeeder extends Seeder
     {
         $factory = Task::factory($count)
             ->forTray($tray)
-            ->sequence(fn($sequence) => ["position" => $sequence->index]);
+            ->sequence(fn ($sequence) => ['position' => $sequence->index]);
 
         return $factory->create([
-            "user_id" => $user->id,
+            'user_id' => $user->id,
         ]);
     }
 }

@@ -34,7 +34,7 @@ return new class extends Migration
             $table->text('note')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->unsignedInteger('duration')->nullable();
-            $table->boolean('blocked_at')->default(false);
+            $table->boolean('blocked_at')->nullable();
             $table->unsignedInteger('position')->default(0);
             $table->timestamps();
             $table->softDeletes();

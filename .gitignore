@@ -38,3 +38,4 @@ yarn-error.log
 /opencode.json
 /opencode.jsonc
 /native.cmd
+/nativephp/electron/dist/

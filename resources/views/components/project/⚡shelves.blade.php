@@ -53,12 +53,12 @@ new class extends Component
 ?>
 
 <div>
-    <flux:card size="sm" variant="filled" class="flex items-center gap-2 mb-4">
-        <flux:heading class="text-accent font-bold! font-display" size="xl">Shelves</flux:heading>
+    <div class="flex items-center gap-2 mb-4">
+        <flux:heading class="text-zinc-600/80 font-semibold! font-display" size="lg">Shelves</flux:heading>
         <flux:spacer />
         <flux:button icon="archive-box" size="sm" variant="filled" />
         <flux:button wire:click="addShelf" icon="plus" size="sm" variant="filled">Add Shelf</flux:button>
-    </flux:card>
+    </div>
     <x-ui.pan-board name="shelves" wire:sort="moveShelf" wire:transition wire:sort:group="shelves" class="w-full pb-2"
         scroll-on="shelf-added">
 

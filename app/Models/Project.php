@@ -40,6 +40,11 @@ class Project extends Model implements HasTrays
         ];
     }
 
+    public function blueprint(): HasOne
+    {
+        return $this->hasOne(Blueprint::class);
+    }
+
     public function owningProject(): Project
     {
         return $this;
