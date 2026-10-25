@@ -8,8 +8,7 @@
 <div class="flex items-stretch gap-1">
     <flux:button.group>
         <flux:button href="{{ route('workbench', $project->id) }}" wire:navigate aria-label="Workbench" variant="filled"
-            icon="wrench-screwdriver" color="{{ $project->color }}" class="{{ $buttonClass }}">Workbench
-            <flux:badge variant="{{ $badgeVariant }}" color="{{ $project->color }}">{{ $count }}</flux:badge>
+            icon="wrench-screwdriver" color="{{ $project->color }}" class="{{ $buttonClass }}">{{ $count }}
         </flux:button>
 
         @if ($active)

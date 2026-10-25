@@ -27,9 +27,9 @@
         )
         ->add(
             match ($variant) {
-                'muted' => '[:where(&)]:text-zinc-600 [:where(&)]:dark:text-zinc-100',
+                'muted' => '[:where(&)]:text-zinc-600 [:where(&)]:dark:text-zinc-200',
                 'subtle' => '[:where(&)]:text-zinc-500 [:where(&)]:dark:text-zinc-300',
-                default => '[:where(&)]:text-zinc-800 [:where(&)]:dark:text-white',
+                default => '[:where(&)]:text-zinc-700 [:where(&)]:dark:text-zinc-50',
             },
         );
 @endphp

@@ -1,15 +1,16 @@
 @props(['tray', 'badgeColor'])
 
-<flux:card {{ $attributes->class('max-w-84 w-full max-h-full flex flex-col shrink-0 bg-white/20! p-3') }}
+<flux:card
+    {{ $attributes->class('max-w-84 w-full max-h-full flex flex-col shrink-0  p-3 rounded-md! bg-white/30 dark:bg-zinc-800/30') }}
     :highlight="true" variant="soft" body="inset" size="sm">
     <flux:card.header class="shrink-0 group/tray">
         <div class="flex items-center gap-2">
             <flux:icon.grip-vertical wire:sort:handle variant="micro"
-                class="opacity-20 group-hover/tray:opacity-80 transition-opacity cursor-grab text-zinc-500 -ml-3" />
+                class="opacity-20 group-hover/tray:opacity-80 transition-opacity cursor-grab text-zinc-600 dark:text-zinc-200 -ml-3" />
             <div class="flex items-center gap-4">
                 <x-ui.input-ghost wire:key="tray-name-{{ $tray->id }}" focus-on="tray-added" :focus-id="$tray->id"
                     :value="$tray->name" maxlength="255" x-on:save="$wire.renameTray({{ $tray->id }}, $event.detail)"
-                    class="font-medium text-zinc-600! text-xl font-display" />
+                    class="font-medium text-zinc-600 dark:text-zinc-200 text-xl font-display" />
                 <flux:badge color="{{ $badgeColor }}">{{ $tray->active_tasks_count }}</flux:badge>
             </div>
         </div>
@@ -34,8 +35,8 @@
             <x-ui.bump-textarea wire:key="task-textarea-tray-{{ $tray->id }}" rows="1"
                 class="pl-4! pr-7! rounded-xl!" resize="none">
                 <x-slot:placeholder>
-                    <flux:icon name="plus" variant="micro" class="text-zinc-400" />
-                    <flux:text class="font-medium" variant="subtle">Add Task</flux:text>
+                    <flux:icon name="plus" variant="micro" class="text-zinc-300 dark:text-zinc-50/30" />
+                    <flux:text variant="subtle">Add Task</flux:text>
                 </x-slot:placeholder>
             </x-ui.bump-textarea>
         </x-ui.task-router>

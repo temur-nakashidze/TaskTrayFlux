@@ -3,8 +3,8 @@
 <flux:card.body
     {{ $attributes->merge([
         'class' => Arr::toCssClasses([
-            'group/task relative py-3!',
-            'border  rounded-md bg-white/70 opacity-70' => $completed,
+            'group/task relative dark:bg-zinc-800 py-3! rounded-sm!',
+            'rounded-sm! bg-white/70 dark:bg-zinc-900/70 opacity-70' => $completed,
         ]),
     ]) }}
     data-task-card>

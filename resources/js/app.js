@@ -1,7 +1,7 @@
-import "./task-router.js";
 const html = document.documentElement;
 const body = document.body;
-
+import "./task-router.js";
+import "./markdown-editor.js";
 /* ---------- Helpers ---------- */
 
 const nowSeconds = () => Math.floor(Date.now() / 1000);

@@ -139,9 +139,9 @@ new class extends Component
 };
 ?>
 
-<div>
-    <div class="flex items-center gap-2 mb-4">
-        <flux:heading class="text-zinc-600/80 font-semibold! font-display" size="lg">Trays</flux:heading>
+<div class="p-6">
+    <div class="flex items-start gap-2 mb-4">
+        <flux:heading class="font-semibold! font-display" variant="muted" size="lg">Trays</flux:heading>
         <flux:spacer />
         <flux:button icon="archive-box" variant="filled" size="sm" />
         <flux:button wire:click="addTray" icon="plus" size="sm" variant="filled">Add Tray</flux:button>

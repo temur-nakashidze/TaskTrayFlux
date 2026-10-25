@@ -1,10 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@100..900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Spline+Sans+Mono:ital,wght@0,300..700;1,300..700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=Geist:ital,wght@0,100..900;1,100..900&family=Roboto+Slab:wght@100..900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 @import "../../vendor/livewire/flux/dist/flux.css";
+@import "./themes.css";
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -14,6 +14,10 @@
 @font-face {
     font-family: "Monolisa";
     src: url("/resources/fonts/MonoLisa-normal.ttf") format("truetype");
+}
+@font-face {
+    font-family: "Courier New";
+    src: url("/resources/fonts/cour.ttf") format("truetype");
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -27,69 +31,9 @@
     --tracking-snug-wide: 0.0115em;
     --text-base: 14px; /* 14px */
     --font-display: "Geist Mono", ui-sans-serif, system-ui, sans-serif;
-    --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+    --font-sans:
+        "Geist", "Noto Sans Georgian", ui-sans-serif, system-ui, sans-serif;
     --font-mono: "Geist Mono", ui-monospace, monospace;
-
-    --color-alabaster-grey-50: #f3f1f3;
-    --color-alabaster-grey-100: #e6e4e7;
-    --color-alabaster-grey-200: #cdc9cf;
-    --color-alabaster-grey-300: #b4aeb7;
-    --color-alabaster-grey-400: #9b939f;
-    --color-alabaster-grey-500: #827887;
-    --color-alabaster-grey-600: #68606c;
-    --color-alabaster-grey-700: #4e4851;
-    --color-alabaster-grey-800: #343036;
-    --color-alabaster-grey-900: #1a181b;
-    --color-alabaster-grey-950: #121113;
-
-    --color-dim-grey-50: #f2f2f3;
-    --color-dim-grey-100: #e6e4e7;
-    --color-dim-grey-200: #cdc9cf;
-    --color-dim-grey-300: #b4afb6;
-    --color-dim-grey-400: #9a949e;
-    --color-dim-grey-500: #817986;
-    --color-dim-grey-600: #67616b;
-    --color-dim-grey-700: #4e4950;
-    --color-dim-grey-800: #343036;
-    --color-dim-grey-850: #272428;
-    --color-dim-grey-900: #1a181b;
-    --color-dim-grey-950: #121113;
-
-    --color-dusty-grape-50: #f1f0f4;
-    --color-dusty-grape-100: #e2e2e9;
-    --color-dusty-grape-200: #c6c4d4;
-    --color-dusty-grape-300: #a9a7be;
-    --color-dusty-grape-400: #8c8aa8;
-    --color-dusty-grape-500: #706c93;
-    --color-dusty-grape-600: #595775;
-    --color-dusty-grape-700: #434158;
-    --color-dusty-grape-800: #2d2b3b;
-    --color-dusty-grape-900: #16161d;
-    --color-dusty-grape-950: #100f15;
-
-    --color-zinc-50: var(--color-dusty-grape-50);
-    --color-zinc-100: var(--color-dusty-grape-100);
-    --color-zinc-200: var(--color-dusty-grape-200);
-    --color-zinc-300: var(--color-dusty-grape-300);
-    --color-zinc-400: var(--color-dusty-grape-400);
-    --color-zinc-500: var(--color-dusty-grape-500);
-    --color-zinc-600: var(--color-dusty-grape-600);
-    --color-zinc-700: var(--color-dusty-grape-700);
-    --color-zinc-800: var(--color-dusty-grape-800);
-    --color-zinc-900: var(--color-dusty-grape-900);
-    --color-zinc-950: var(--color-dusty-grape-950);
-
-    --color-accent: #61616b;
-    --color-accent-content: #61616b;
-    --color-accent-foreground: #f2f2f3;
-}
-
-@layer theme {
-    .dark {
-        --color-accent: #c9c9cf;
-        --color-accent-content: #494950;
-        --color-accent-foreground: #494950;
-    }
 }
 
 @layer base {
@@ -99,6 +43,15 @@
     ::backdrop,
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
+    }
+    body {
+        /* Default light mode fallback text and background colors */
+        color: var(--color-zinc-700);
+        -webkit-font-smoothing: antialiased;
+    }
+    .dark body,
+    :root[data-theme="dark"] body {
+        color: var(--color-zinc-200);
     }
 }
 
@@ -124,6 +77,10 @@ select[data-flux-control] {
 
 [data-flux-button] {
     @apply cursor-pointer font-mono!;
+}
+
+[data-flux-badge] {
+    @apply cursor-pointer font-mono! rounded-sm;
 }
 
 html.transitions-ready [data-flux-button] {
@@ -208,6 +165,14 @@ html.transitions-ready [data-flux-button] [data-flux-icon] {
 ::view-transition-group(shelves),
 ::view-transition-group(trays) {
     overflow: clip;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+    color: var(--color-zinc-400);
 }
 /* \[:where(&)\]:size-4 {
     @apply size-4;

@@ -5,9 +5,9 @@
     @include('partials.head')
 </head>
 
-<body class="min-h-screen bg-zinc-100 dark:bg-zinc-900">
-    <flux:sidebar class="w-73 bg-zinc-100" style="view-transition-name: sidebar" sticky>
-        <div class="border-b border-zinc-200/50 -mx-4 py-4 -mt-4 px-4">
+<body class="min-h-screen bg-zinc-100 dark:bg-zinc-900 subpixel-antialiased">
+    <flux:sidebar class="w-80 bg-zinc-100 dark:bg-zinc-950" style="view-transition-name: sidebar" sticky>
+        <div class="border-b border-zinc-200/50 dark:border-zinc-800/60 -mx-4 py-4 -mt-4 px-4">
             <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
         </div>
 
@@ -17,6 +17,8 @@
         <flux:spacer />
 
         Tags
+
+        <x-ui.theme-picker />
         <flux:radio.group x-data variant="segmented" x-model="$flux.appearance">
             <flux:radio value="light" icon="sun" />
             <flux:radio value="dark" icon="moon" />

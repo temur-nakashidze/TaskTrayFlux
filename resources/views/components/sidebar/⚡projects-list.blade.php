@@ -112,7 +112,7 @@ new class extends Component
         $trays = config("projects.templates.{$template}.trays");
         abort_if($trays === null, 422);
 
-        $project = app(CreateProject::class)->handle(auth()->user(), $name, $trays);
+        $project = app(CreateProject::class)->handle(auth()->user(), $name, $this->projectColor, $trays);
 
         return $this->redirectRoute('project', $project, navigate: true);
     }
@@ -121,7 +121,7 @@ new class extends Component
     {
         $this->selectedId = $project->id;
         $this->projectName = $project->name;
-        $this->projectColor = $project->color;
+        $this->projectColor = $project->color->value;
         $this->modal('edit-project')->show();
     }
 
@@ -185,7 +185,7 @@ new class extends Component
             </flux:modal.trigger>
 
 
-            <div wire:sort="moveProject" wire:sort:group="projects" class="space-y-0.5">
+            <div wire:sort="moveProject" wire:sort:group="projects" class="space-y-2">
                 @foreach ($this->projects as $project)
                     @php
                         $isCurrent =
@@ -195,7 +195,8 @@ new class extends Component
 
 
                     <x-ui.sidebar-branch :handle="true" :href="route('project', $project)" :current="$isCurrent"
-                        badgeColor="{{ $project->color }}" :item="$project" context>
+                        color="{{ $project->color }}" :item="$project" :workbench="$project->workbench()->exists()" :blueprint="$project->blueprint()->exists()"
+                        :expandable="$project->shelves()->exists()" context>
                         <x-slot:label>
                             {{ $project->name }}
                         </x-slot:label>
@@ -214,38 +215,26 @@ new class extends Component
                             </x-ui.context-menu.item>
                         </x-slot:context-menu>
 
-                        <x-slot:badge>
-                            <div class="flex items-center gap-2">
-                                <flux:icon.pencil-ruler class="size-4" />
-                                {{ $project->workbench_tasks_count }}
-                            </div>
-                        </x-slot:badge>
-                        @if ($project->blueprint)
-                            <a href="{{ route('blueprint', $project) }}">
-                                <div>bluepint</div>
-                            </a>
-                        @endif
+                        @if ($project->shelves()->exists())
+                            <div wire:sort="moveTray" wire:sort:group="sidebar-trays-{{ $project->id }}"
+                                class="mt-2 space-y-1.5 mb-1">
+                                @foreach ($project->shelves as $shelf)
+                                    <div wire:key="sidebar-shelf-{{ $shelf->id }}"
+                                        wire:sort:item="{{ $shelf->id }}"
+                                        class="group/shelf flex items-center gap-1 bg-zinc-100/40 dark:bg-zinc-950 border border-zinc-100/80 dark:border-zinc-50/10 rounded-xs px-2">
+                                        <x-ui.handle parent="shelf" />
 
-                        {{-- tray reordering --}}
-                        <div wire:sort="moveTray" wire:sort:group="sidebar-trays-{{ $project->id }}"
-                            class="ml-4 mt-1 mb-2 space-y-1 border-l border-zinc-200 pl-2 dark:border-zinc-700">
-                            @foreach ($project->trays as $tray)
-                                <div wire:key="sidebar-tray-{{ $tray->id }}" wire:sort:item="{{ $tray->id }}"
-                                    class="group/stray flex items-center gap-1">
-
-                                    <flux:icon.grip-vertical wire:sort:handle variant="micro"
-                                        class="size-3.5 shrink-0 cursor-grab text-zinc-400 opacity-0 transition-opacity group-hover/stray:opacity-70" />
-
-                                    {{-- task drop zone (drop-only) --}}
-                                    <div x-data="trayDrop({{ $tray->id }})" x-on:dragenter="enter($event)"
-                                        x-on:dragover="enter($event)" x-on:dragleave="leave($event)"
-                                        x-on:drop="drop($event)" x-bind:class="over && 'bg-accent/20'"
-                                        class="min-h-7 flex-1 rounded-md px-2 py-1 text-sm text-zinc-500 ">
-                                        <span class="pointer-events-none">{{ $tray->name ?? 'Untitled' }}</span>
+                                        {{-- task drop zone (drop-only) --}}
+                                        <div x-data="trayDrop({{ $shelf->id }})" x-on:dragenter="enter($event)"
+                                            x-on:dragover="enter($event)" x-on:dragleave="leave($event)"
+                                            x-on:drop="drop($event)" x-bind:class="over && 'bg-accent/20'"
+                                            class="min-h-7 flex-1 rounded-md py-1.5 text-sm text-zinc-500 dark:text-zinc-50/70">
+                                            <span class="pointer-events-none">{{ $shelf->name ?? 'Untitled' }}</span>
+                                        </div>
                                     </div>
-                                </div>
-                            @endforeach
-                        </div>
+                                @endforeach
+                            </div>
+                        @endif
                     </x-ui.sidebar-branch>
                 @endforeach
             </div>

@@ -16,7 +16,11 @@ new class extends Component
     #[Computed]
     public function shelves()
     {
-        return $this->project->shelves()->ordered('asc')->get();
+        return $this->project
+            ->shelves()
+            ->withCount(['tasks', 'tasks as completed_tasks_count' => fn ($q) => $q->whereNotNull('tasks.completed_at')])
+            ->ordered('asc')
+            ->get();
     }
 
     public function addShelf(CreateShelf $action): void
@@ -52,9 +56,9 @@ new class extends Component
 };
 ?>
 
-<div>
-    <div class="flex items-center gap-2 mb-4">
-        <flux:heading class="text-zinc-600/80 font-semibold! font-display" size="lg">Shelves</flux:heading>
+<div class="p-6">
+    <div class="flex items-start gap-2 mb-4">
+        <flux:heading class="font-semibold! font-display" variant="muted" size="lg">Shelves</flux:heading>
         <flux:spacer />
         <flux:button icon="archive-box" size="sm" variant="filled" />
         <flux:button wire:click="addShelf" icon="plus" size="sm" variant="filled">Add Shelf</flux:button>

@@ -30,10 +30,10 @@
             ? '[:where(&)]:border-zinc-900/10 dark:[:where(&)]:border-white/10'
             : match ($variant) {
                 'filled' => '',
-                'muted' => '[:where(&)]:border-zinc-900/10 dark:[:where(&)]:border-white/12',
-                'soft' => '[:where(&)]:border-zinc-900/7 dark:[:where(&)]:border-white/7',
-                'outline' => '[:where(&)]:border-zinc-900/10 dark:[:where(&)]:border-white/15',
-                default => '[:where(&)]:border-zinc-900/10 dark:[:where(&)]:border-white/10',
+                'muted' => '[:where(&)]:border-zinc-900/10 dark:[:where(&)]:border-zinc-50/12',
+                'soft' => '[:where(&)]:border-zinc-900/7 dark:[:where(&)]:border-zinc-50/7',
+                'outline' => '[:where(&)]:border-zinc-900/10 dark:[:where(&)]:border-zinc-50/15',
+                default => '[:where(&)]:border-zinc-900/10 dark:[:where(&)]:border-zinc-50/10',
             },
     )
     ->add(in_array($variant, [null, 'default'], true) ? '[:where(&)]:shadow-xs dark:[:where(&)]:shadow-none' : '')
@@ -48,13 +48,13 @@
     )
     ->add(
         $coloredBands
-            ? '[:where(&)]:bg-white dark:[:where(&)]:bg-white/10'
+            ? '[:where(&)]:bg-white dark:[:where(&)]:bg-zinc-50/10'
             : match ($variant) {
-                'filled' => '[:where(&)]:bg-zinc-900/3 dark:[:where(&)]:bg-white/6',
-                'muted' => '[:where(&)]:bg-zinc-900/4 dark:[:where(&)]:bg-white/7',
-                'soft' => '[:where(&)]:bg-zinc-900/2 dark:[:where(&)]:bg-white/5',
+                'filled' => '[:where(&)]:bg-zinc-900/3 dark:[:where(&)]:bg-zinc-50/6',
+                'muted' => '[:where(&)]:bg-zinc-900/4 dark:[:where(&)]:bg-zinc-50/7',
+                'soft' => '[:where(&)]:bg-zinc-900/2 dark:[:where(&)]:bg-zinc-50/5',
                 'outline' => '[:where(&)]:bg-transparent',
-                default => '[:where(&)]:bg-white dark:[:where(&)]:bg-white/10',
+                default => '[:where(&)]:bg-white dark:[:where(&)]:bg-zinc-50/10',
             },
     );
 

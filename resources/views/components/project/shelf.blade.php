@@ -1,26 +1,26 @@
 <x-ui.context-menu class="max-w-84 w-full">
     <flux:card
-        {{ $attributes->merge(['class' => ' max-h-full flex flex-col shrink-0 hover:shadow-none hover:border-accent/30 group-data-[open]:shadow-none group-data-[open]:border-accent/30  transition-colors bg-white/40!']) }}
-        :highlight="true" variant="outline" body="semeless" size="sm">
+        {{ $attributes->merge(['class' => ' max-h-full flex flex-col shrink-0 hover:shadow-none hover:border-accent/30 group-data-[open]:shadow-none group-data-[open]:border-accent/30  transition-colors bg-white/30 dark:bg-zinc-800/30 rounded-md!']) }}
+        :highlight="true" variant="soft" body="semeless" size="sm">
         <a href="{{ route('shelf', [$shelf->project_id, $shelf]) }}" wire:navigate
             class="absolute inset-0 rounded-[inherit] focus-visible:outline-2 focus-visible:outline-accent"
             aria-label="Open {{ $shelf->name }}"></a>
         <flux:card.header class="shrink-0 group/shelf">
             <div class="flex items-center gap-2">
-                <flux:icon.grip-vertical wire:sort:handle variant="mini"
-                    class="opacity-20 group-hover/shelf:opacity-80 transition-opacity cursor-grab text-zinc-500 -ml-3" />
+                <x-ui.handle parent="shelf" />
                 <div class="flex items-center gap-4">
                     <x-ui.input-ghost wire:key="shelf-name-{{ $shelf->id }}" focus-on="shelf-added" :focus-id="$shelf->id"
                         :value="$shelf->name" maxlength="255"
                         x-on:save="$wire.renameShelf({{ $shelf->id }}, $event.detail)"
-                        class="font-bold text-accent text-xl font-display z-10" />
+                        class="font-medium text-zinc-600 dark:text-zinc-200 text-xl font-display z-20" />
                 </div>
             </div>
         </flux:card.header>
         <flux:card.body class="py-0">
             <flux:field>
-                <flux:progress value="75" class="h-2.5" color="{{ $color }}" />
-                <flux:text class="text-xs">Completed 3 of 7 tasks...</flux:text>
+                <flux:progress value="{{ $shelf->progress }}" class="h-2.5" color="{{ $color }}" />
+                <flux:text class="text-xs">Completed {{ $shelf->completed_tasks_count }} of {{ $shelf->tasks_count }}
+                    tasks...</flux:text>
             </flux:field>
         </flux:card.body>
         <flux:card.footer>

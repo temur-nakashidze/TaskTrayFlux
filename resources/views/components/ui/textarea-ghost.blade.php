@@ -20,4 +20,4 @@
             $dispatch('save', v)
         }
     "
-    {{ $attributes->class('block w-full field-sizing-content resize-none overflow-hidden bg-transparent border-none outline-none! ring-0 rounded px-1 -mx-1 text-zinc-600 font-normal') }}>{{ $value }}</textarea>
+    {{ $attributes->class('block w-full field-sizing-content resize-none overflow-hidden bg-transparent border-none outline-none! ring-0 rounded px-1 -mx-1 text-zinc-600 dark:text-zinc-200 font-normal') }}>{{ $value }}</textarea>

@@ -1,0 +1,120 @@
+/* Palettes: move alabaster-grey, dim-grey and dusty-grape here unchanged.
+   `static` keeps the variables in the build even if no utility uses them,
+   which the picker swatches need. */
+@theme static {
+    --color-alabaster-grey-50: #f3f1f3;
+    --color-alabaster-grey-100: #e6e4e7;
+    --color-alabaster-grey-200: #cdc9cf;
+    --color-alabaster-grey-300: #b4aeb7;
+    --color-alabaster-grey-400: #9b939f;
+    --color-alabaster-grey-500: #827887;
+    --color-alabaster-grey-600: #68606c;
+    --color-alabaster-grey-700: #4e4851;
+    --color-alabaster-grey-800: #343036;
+    --color-alabaster-grey-900: #1a181b;
+    --color-alabaster-grey-950: #121113;
+
+    --color-dim-grey-50: #f2f2f3;
+    --color-dim-grey-100: #e6e4e7;
+    --color-dim-grey-200: #cdc9cf;
+    --color-dim-grey-300: #b4afb6;
+    --color-dim-grey-400: #9a949e;
+    --color-dim-grey-500: #817986;
+    --color-dim-grey-600: #67616b;
+    --color-dim-grey-700: #4e4950;
+    --color-dim-grey-800: #343036;
+    --color-dim-grey-850: #272428;
+    --color-dim-grey-900: #1a181b;
+    --color-dim-grey-950: #121113;
+
+    --color-dusty-grape-50: #f1f0f4;
+    --color-dusty-grape-100: #e2e2e9;
+    --color-dusty-grape-200: #c6c4d4;
+    --color-dusty-grape-300: #a9a7be;
+    --color-dusty-grape-400: #8c8aa8;
+    --color-dusty-grape-500: #706c93;
+    --color-dusty-grape-600: #595775;
+    --color-dusty-grape-700: #434158;
+    --color-dusty-grape-800: #2d2b3b;
+    --color-dusty-grape-900: #16161d;
+    --color-dusty-grape-950: #100f15;
+}
+
+/* Defaults: zinc = dim-grey, accent = your current mono */
+@theme {
+    --color-zinc-50: var(--color-dim-grey-50);
+    --color-zinc-100: var(--color-dim-grey-100);
+    --color-zinc-200: var(--color-dim-grey-200);
+    --color-zinc-300: var(--color-dim-grey-300);
+    --color-zinc-400: var(--color-dim-grey-400);
+    --color-zinc-500: var(--color-dim-grey-500);
+    --color-zinc-600: var(--color-dim-grey-600);
+    --color-zinc-700: var(--color-dim-grey-700);
+    --color-zinc-800: var(--color-dim-grey-800);
+    --color-zinc-900: var(--color-dim-grey-900);
+    --color-zinc-950: var(--color-dim-grey-950);
+
+    --color-accent: #61616b;
+    --color-accent-content: #61616b;
+    --color-accent-foreground: #f2f2f3;
+}
+
+@layer theme {
+    .dark {
+        --color-accent: #c9c9cf;
+        --color-accent-content: #494950;
+        --color-accent-foreground: #494950;
+    }
+}
+
+/* Zinc tints (whole-site) */
+[data-zinc="alabaster-grey"] {
+    --color-zinc-50: var(--color-alabaster-grey-50);
+    --color-zinc-100: var(--color-alabaster-grey-100);
+    --color-zinc-200: var(--color-alabaster-grey-200);
+    --color-zinc-300: var(--color-alabaster-grey-300);
+    --color-zinc-400: var(--color-alabaster-grey-400);
+    --color-zinc-500: var(--color-alabaster-grey-500);
+    --color-zinc-600: var(--color-alabaster-grey-600);
+    --color-zinc-700: var(--color-alabaster-grey-700);
+    --color-zinc-800: var(--color-alabaster-grey-800);
+    --color-zinc-900: var(--color-alabaster-grey-900);
+    --color-zinc-950: var(--color-alabaster-grey-950);
+}
+
+[data-zinc="dusty-grape"] {
+    --color-zinc-50: var(--color-dusty-grape-50);
+    --color-zinc-100: var(--color-dusty-grape-100);
+    --color-zinc-200: var(--color-dusty-grape-200);
+    --color-zinc-300: var(--color-dusty-grape-300);
+    --color-zinc-400: var(--color-dusty-grape-400);
+    --color-zinc-500: var(--color-dusty-grape-500);
+    --color-zinc-600: var(--color-dusty-grape-600);
+    --color-zinc-700: var(--color-dusty-grape-700);
+    --color-zinc-800: var(--color-dusty-grape-800);
+    --color-zinc-900: var(--color-dusty-grape-900);
+    --color-zinc-950: var(--color-dusty-grape-950);
+}
+
+/* Accents */
+[data-accent="violet"] {
+    --color-accent: var(--color-violet-600);
+    --color-accent-content: var(--color-violet-600);
+    --color-accent-foreground: var(--color-white);
+}
+.dark[data-accent="violet"] {
+    --color-accent: var(--color-violet-400);
+    --color-accent-content: var(--color-violet-400);
+    --color-accent-foreground: var(--color-violet-950);
+}
+
+[data-accent="emerald"] {
+    --color-accent: var(--color-emerald-600);
+    --color-accent-content: var(--color-emerald-600);
+    --color-accent-foreground: var(--color-white);
+}
+.dark[data-accent="emerald"] {
+    --color-accent: var(--color-emerald-400);
+    --color-accent-content: var(--color-emerald-400);
+    --color-accent-foreground: var(--color-emerald-950);
+}

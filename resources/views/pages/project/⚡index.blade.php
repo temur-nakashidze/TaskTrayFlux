@@ -8,12 +8,9 @@ new class extends Component
 {
     public Project $project;
 
-    public array $trayNames = [];
-
     public function mount(Project $project): void
     {
         $this->project = $project;
-        $this->trayNames = $project->trays()->pluck('name', 'id')->all();
     }
 
     #[On('tasks-moved')]
@@ -34,11 +31,14 @@ new class extends Component
 <div>
 
     <livewire:project.project-header :project="$this->project" />
-    <div class="space-y-4 p-4">
+    <div class="space-y-2 -mx-6 -mt-6">
         <livewire:project.shelves :project="$this->project" />
+        <flux:separator variant="muted" />
         <livewire:project.trays :owner="$this->project" />
+
 
         <livewire:project.tray-trash />
         <livewire:project.log />
+        <x-project.settings />
     </div>
 </div>

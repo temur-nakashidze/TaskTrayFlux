@@ -52,13 +52,19 @@ new class extends Component
     public function refresh(): void {}
 };
 ?>
-
 <div
-    class="sticky top-0 z-30  bg-white/20 border-b border-zinc-200/50 mb-6 flex items-center gap-4 -mx-6 -mt-6 px-4 py-4 backdrop-blur-md">
+    class="sticky top-0 z-30  bg-white/20 dark:bg-zinc-800/10 border-b border-zinc-200/50 dark:border-zinc-800/50 mb-6 flex items-center gap-2 -mx-6 -mt-6 px-4 py-4 backdrop-blur-md">
     <x-ui.input-ghost wire:key="project-name-{{ $project->id }}" :value="$projectName" maxlength="255"
         x-on:save="$wire.renameProject({{ $project->id }}, $event.detail)"
-        class="font-bold! text-zinc-600 text-2xl font-display uppercase" />
-    <flux:button icon="rotate-ccw-clock" variant="subtle" wire:click="$dispatch('open-project-log')" />
+        class="font-bold! text-zinc-600 dark:text-zinc-50/70 text-2xl font-display uppercase" />
     <flux:spacer />
     <x-project.workbench-button :project="$project" :count="$this->workbenchTasksCount" :active="$onWorkbench" />
+    <flux:button icon="square-dashed-text" color="{{ $project->color->value }}" variant="filled"
+        href="{{ route('blueprint', $project->id) }}" />
+    <div class="flex items-center gap-1 ml-2">
+        <flux:button icon="rotate-ccw-clock" variant="subtle" wire:click="$dispatch('open-project-log')" />
+        <flux:modal.trigger name="project-settings">
+            <flux:button icon="cog-6-tooth" variant="subtle"></flux:button>
+        </flux:modal.trigger>
+    </div>
 </div>

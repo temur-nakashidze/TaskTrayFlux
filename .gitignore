@@ -39,3 +39,4 @@ yarn-error.log
 /opencode.jsonc
 /native.cmd
 /nativephp/electron/dist/
+.vitest/

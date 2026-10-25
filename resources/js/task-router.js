@@ -11,11 +11,7 @@ const fuzzy = (q, s) => {
 const findNamed = (list, text) => {
     const t = text.toLowerCase();
     if (!t) return null;
-    return (
-        list.find((x) => slug(x.name) === t) ??
-        list.find((x) => fuzzy(t, x.name)) ??
-        null
-    );
+    return list.find((x) => slug(x.name) === t) ?? list.find((x) => fuzzy(t, x.name)) ?? null;
 };
 
 // second level: the project's shelves and its own trays
@@ -70,9 +66,7 @@ document.addEventListener("alpine:init", () => {
             },
 
             get project() {
-                return this.depth >= 1
-                    ? findNamed(this.projects, this.segs[0])
-                    : null;
+                return this.depth >= 1 ? findNamed(this.projects, this.segs[0]) : null;
             },
 
             get shelf() {
@@ -84,30 +78,17 @@ document.addEventListener("alpine:init", () => {
             get routeLabel() {
                 if (!this.route) return "";
                 const { project, shelf, dest } = this.route;
-                return (
-                    "→ " +
-                    [project.name, shelf?.name, dest?.name]
-                        .filter(Boolean)
-                        .join(" / ")
-                );
+                return "→ " + [project.name, shelf?.name, dest?.name].filter(Boolean).join(" / ");
             },
 
             // ---- tag mode (#) ----
             get tagItems() {
                 const q = this.query.toLowerCase();
-                const taken = new Set(
-                    this.chosen.map((t) => t.name.toLowerCase()),
-                );
+                const taken = new Set(this.chosen.map((t) => t.name.toLowerCase()));
                 const list = this.tags
-                    .filter(
-                        (t) =>
-                            !taken.has(t.name.toLowerCase()) &&
-                            fuzzy(q, t.name),
-                    )
+                    .filter((t) => !taken.has(t.name.toLowerCase()) && fuzzy(q, t.name))
                     .map((t) => ({ kind: "tag", ...t }));
-                const exists =
-                    taken.has(q) ||
-                    this.tags.some((t) => t.name.toLowerCase() === q);
+                const exists = taken.has(q) || this.tags.some((t) => t.name.toLowerCase() === q);
                 if (q && !exists)
                     list.push({
                         kind: "new-tag",
@@ -206,13 +187,7 @@ document.addEventListener("alpine:init", () => {
                     return;
                 }
                 if (item.kind === "shelf") {
-                    this.replaceToken(
-                        "@" +
-                            slug(this.project.name) +
-                            "/" +
-                            slug(item.name) +
-                            "/",
-                    );
+                    this.replaceToken("@" + slug(this.project.name) + "/" + slug(item.name) + "/");
                     return;
                 }
 
@@ -255,30 +230,21 @@ document.addEventListener("alpine:init", () => {
                 }
 
                 const n = this.items.length;
-                const handled = [
-                    "ArrowDown",
-                    "ArrowUp",
-                    "Enter",
-                    "Tab",
-                    "Escape",
-                ].includes(e.key);
+                const handled = ["ArrowDown", "ArrowUp", "Enter", "Tab", "Escape"].includes(e.key);
                 if (!handled) return;
                 e.preventDefault();
                 e.stopPropagation();
 
-                if (e.key === "ArrowDown")
-                    this.active = (this.active + 1) % Math.max(n, 1);
+                if (e.key === "ArrowDown") this.active = (this.active + 1) % Math.max(n, 1);
                 else if (e.key === "ArrowUp")
-                    this.active =
-                        (this.active - 1 + Math.max(n, 1)) % Math.max(n, 1);
+                    this.active = (this.active - 1 + Math.max(n, 1)) % Math.max(n, 1);
                 else if (e.key === "Enter" || e.key === "Tab") {
                     if (n) this.pick(this.items[this.active]);
                     else {
                         this.open = false;
                         if (e.key === "Enter") this.submit();
                     }
-                } else if (this.current === "route" && this.depth > 0)
-                    this.acceptCurrent();
+                } else if (this.current === "route" && this.depth > 0) this.acceptCurrent();
                 else this.open = false;
             },
 
