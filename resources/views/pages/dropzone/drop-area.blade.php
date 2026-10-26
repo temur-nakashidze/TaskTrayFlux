@@ -3,7 +3,7 @@
         <div class="flex items-center gap-4">
             <flux:heading class="font-display font-bold! text-accent tracking-tight" size="2xl">Drop Zone
             </flux:heading>
-            <flux:badge size="lg">12</flux:badge>
+            <flux:badge size="lg">{{ $this->dropzoneTaskCount }}</flux:badge>
         </div>
         <flux:card.actions>
             <flux:button variant="filled" icon="arrows-up-down"></flux:button>
@@ -23,11 +23,11 @@
     </div>
 
     <div class="space-y-2">
-        <flux:card.body size="sm">
-
-        </flux:card.body>
-        <flux:card.body size="sm">
-
-        </flux:card.body>
+        @if ($this->dropzoneTaskCount === 0)
+            <flux:card.body size="sm">
+                <x-ui.empty-state heading="No tasks in the Dropzone"
+                    description="Tasks without a project belong here. Add one above or route a task here." />
+            </flux:card.body>
+        @endif
     </div>
 </flux:card>

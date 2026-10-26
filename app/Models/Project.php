@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use LogicException;
 
 #[Fillable(['user_id', 'name', 'icon', 'color', 'position'])]
 #[ObservedBy([ProjectObserver::class])]
@@ -26,10 +25,9 @@ class Project extends Model implements HasTrays
     use HasPosition;
     use SoftDeletes;
 
-    public function trayForTasks(): Tray
+    public function positionGroupColumns(): array
     {
-        return $this->unsortedTray ??
-            throw new LogicException('Shelf has no unsorted tray');
+        return ['user_id'];
     }
 
     protected function casts(): array

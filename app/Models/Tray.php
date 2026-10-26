@@ -6,6 +6,7 @@ use App\Concerns\HasPosition;
 use App\Observers\TrayObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -73,8 +74,24 @@ class Tray extends Model
         return $this->hasMany(WorkbenchTask::class)->orderBy('position');
     }
 
-    public function scopeInProject(Builder $query, Project $project): void
+    #[Scope]
+    protected function forUser(Builder $query, User $user): void
     {
-        $query->whereMorphedTo('trayable', $project);
+        $query->where(function (Builder $query) use ($user) {
+            $query
+                ->whereHasMorph(
+                    'trayable',
+                    Project::class,
+                    fn (Builder $query) => $query->where('user_id', $user->id),
+                )
+                ->orWhereHasMorph(
+                    'trayable',
+                    Shelf::class,
+                    fn (Builder $query) => $query->whereHas(
+                        'project',
+                        fn (Builder $query) => $query->where('user_id', $user->id),
+                    ),
+                );
+        });
     }
 }

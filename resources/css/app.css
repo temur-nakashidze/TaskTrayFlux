@@ -1,6 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@100..900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=Geist:ital,wght@0,100..900;1,100..900&family=Roboto+Slab:wght@100..900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=Geist:ital,wght@0,100..900;1,100..900&&display=swap");
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @import "../../vendor/livewire/flux/dist/flux.css";
@@ -11,15 +10,6 @@
 @source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
 @source '../../vendor/livewire/flux/stubs/**/*.blade.php';
 
-@font-face {
-    font-family: "Monolisa";
-    src: url("/resources/fonts/MonoLisa-normal.ttf") format("truetype");
-}
-@font-face {
-    font-family: "Courier New";
-    src: url("/resources/fonts/cour.ttf") format("truetype");
-}
-
 @custom-variant dark (&:where(.dark, .dark *));
 :root {
     --board-bg: var(--color-zinc-50);
@@ -27,6 +17,13 @@
 .dark {
     --board-bg: var(--color-zinc-900);
 }
+
+html:not(.transitions-ready) *,
+html:not(.transitions-ready) *::before,
+html:not(.transitions-ready) *::after {
+    transition: none !important;
+}
+
 @theme {
     --tracking-snug-wide: 0.0115em;
     --text-base: 14px; /* 14px */

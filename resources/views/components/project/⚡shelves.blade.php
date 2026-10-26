@@ -49,8 +49,9 @@ new class extends Component
         $this->project->shelves()->findOrFail($id)->moveToPosition($position, 'asc');
     }
 
-    public function deleteShelf(Shelf $shelf)
+    public function deleteShelf(Shelf $shelf): void
     {
+        $shelf = $this->project->shelves()->findOrFail($shelf->getKey());
         $shelf->delete();
     }
 };
@@ -66,9 +67,18 @@ new class extends Component
     <x-ui.pan-board name="shelves" wire:sort="moveShelf" wire:transition wire:sort:group="shelves" class="w-full pb-2"
         scroll-on="shelf-added">
 
-        @foreach ($this->shelves as $shelf)
-            <x-project.shelf wire:sort:item="{{ $shelf->id }}" :color="$this->project->color->value" :shelf="$shelf"
-                wire:key="shelves-shelf-{{ $shelf->id }}"></x-project.shelf>
-        @endforeach
+        @if ($this->shelves->isEmpty())
+            <x-ui.empty-state icon="archive-box" heading="No shelves yet"
+                description="Create a shelf to group trays and tasks in this project.">
+                <x-slot:action>
+                    <flux:button wire:click="addShelf" icon="plus" size="sm" variant="filled">Add first shelf</flux:button>
+                </x-slot:action>
+            </x-ui.empty-state>
+        @else
+            @foreach ($this->shelves as $shelf)
+                <x-project.shelf wire:sort:item="{{ $shelf->id }}" :color="$this->project->color->value" :shelf="$shelf"
+                    wire:key="shelves-shelf-{{ $shelf->id }}"></x-project.shelf>
+            @endforeach
+        @endif
     </x-ui.pan-board>
 </div>

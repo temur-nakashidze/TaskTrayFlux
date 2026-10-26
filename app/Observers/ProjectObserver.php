@@ -32,7 +32,7 @@ class ProjectObserver
 
         if ($workbench = $project->workbench) {
             $workbench->workbenchTasks()->get()->each(fn ($wt) => $wt->delete());
-            $workbench->delete;
+            $workbench->delete();
         }
     }
 

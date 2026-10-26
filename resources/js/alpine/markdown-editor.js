@@ -1,16 +1,8 @@
-import { Editor } from "@tiptap/core";
-import StarterKit from "@tiptap/starter-kit";
-import { Markdown } from "@tiptap/markdown";
-import { Placeholder } from "@tiptap/extensions";
-
-function markdownEditor(model, initial = "") {
+// Tiptap is loaded on demand, so pages without an editor don't download it.
+export default (model, initial = "") => {
     let editor; // closure variable, not reactive Alpine state
     let dirty = false;
-
-    const getMarkdown = (ed) =>
-        typeof ed.getMarkdown === "function"
-            ? ed.getMarkdown()
-            : ed.storage.markdown.getMarkdown();
+    let destroyed = false;
 
     // Unsaved-changes guards: full page leave and wire:navigate
     const onUnload = (e) => {
@@ -31,8 +23,27 @@ function markdownEditor(model, initial = "") {
     return {
         tick: 0,
 
-        init() {
+        async init() {
+            window.addEventListener("beforeunload", onUnload);
+            document.addEventListener("livewire:navigate", onNavigate);
+            // dispatch this event from your Livewire save method
+            this.$wire.$on("blueprint-saved", () => (dirty = false));
+
             try {
+                const [
+                    { Editor },
+                    { default: StarterKit },
+                    { Markdown },
+                    { Placeholder },
+                ] = await Promise.all([
+                    import("@tiptap/core"),
+                    import("@tiptap/starter-kit"),
+                    import("@tiptap/markdown"),
+                    import("@tiptap/extensions"),
+                ]);
+
+                if (destroyed) return; // component was removed while loading
+
                 editor = new Editor({
                     element: this.$refs.editor,
                     extensions: [
@@ -51,14 +62,11 @@ function markdownEditor(model, initial = "") {
                         },
                     },
                     onUpdate: ({ editor }) => {
-                        dirty = true; // onUpdate only fires on real edits, not the initial load
-                        this.$wire.$set(model, getMarkdown(editor), false);
+                        dirty = true; // only fires on real edits, not the initial load
+                        this.$wire.$set(model, editor.getMarkdown(), false);
                     },
                     onTransaction: () => this.tick++,
                 });
-
-                window.addEventListener("beforeunload", onUnload);
-                window.addEventListener("livewire:navigate", onNavigate);
             } catch (error) {
                 console.error("[markdownEditor] failed to start", error);
             }
@@ -73,16 +81,15 @@ function markdownEditor(model, initial = "") {
         },
 
         isActive(name, attrs) {
-            this.tick;
+            void this.tick; // subscribe to editor transactions
             return editor?.isActive(name, ...(attrs ? [attrs] : [])) ?? false;
         },
 
         destroy() {
+            destroyed = true;
             window.removeEventListener("beforeunload", onUnload);
-            window.removeEventListener("livewire:navigate", onNavigate);
+            document.removeEventListener("livewire:navigate", onNavigate);
             editor?.destroy();
         },
     };
-}
-
-window.markdownEditor = markdownEditor;
+};

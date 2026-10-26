@@ -40,6 +40,7 @@ trait ManagesTrays
 
     public function deleteTray(Tray $tray): void
     {
+        $tray = $this->trayOwner()->trays()->findOrFail($tray->getKey());
         app(DeleteTray::class)->handle($tray);
         $this->dispatch('tray-deleted', id: $tray->id);
     }

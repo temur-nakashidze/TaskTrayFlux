@@ -30,8 +30,8 @@ new class extends Component
 
     public function mount(Project $project)
     {
-        $this->workbench = $project->workbench;
-        $this->project = $project;
+        $this->project = auth()->user()->projects()->findOrFail($project->getKey());
+        $this->workbench = $this->project->workbench()->firstOrFail();
         $this->user = auth()->user();
     }
 
@@ -76,6 +76,7 @@ new class extends Component
 
     public function toggleTimer(WorkbenchTask $workbenchTask): void
     {
+        $workbenchTask = $this->workbench->workbenchTasks()->findOrFail($workbenchTask->getKey());
         $task = $workbenchTask->task;
 
         if ($task->runningTimeEntry) {
@@ -126,12 +127,14 @@ new class extends Component
 
     public function completeTask(WorkbenchTask $workbenchTask)
     {
+        $workbenchTask = $this->workbench->workbenchTasks()->findOrFail($workbenchTask->getKey());
         app(CompleteWorkbenchTask::class)->handle($workbenchTask->task, $this->user);
         $this->dispatch('timer-changed');
     }
 
     public function restoreTask(WorkbenchTask $workbenchTask)
     {
+        $workbenchTask = $this->workbench->workbenchTasks()->findOrFail($workbenchTask->getKey());
         app(RestoreTask::class)->handle($workbenchTask->task);
     }
 
@@ -145,6 +148,7 @@ new class extends Component
 
     public function removeFromActive(WorkbenchTask $workbenchTask): void
     {
+        $workbenchTask = $this->workbench->workbenchTasks()->findOrFail($workbenchTask->getKey());
         app(RemoveTaskFromActive::class)->handle($workbenchTask->task);
 
         unset($this->workbenchTasks);
@@ -153,6 +157,7 @@ new class extends Component
 
     public function removeTask(int $taskId)
     {
+        $this->workbench->workbenchTasks()->where('task_id', $taskId)->firstOrFail();
         app(RemoveTaskFromWorkbench::class)->handle($taskId);
         $this->dispatch('workbench-updated');
         $this->dispatch('timer-changed');

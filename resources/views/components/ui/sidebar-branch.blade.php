@@ -1,5 +1,5 @@
 @props([
-    'href',
+    'href' => null,
     'current' => false,
     'open' => null,
     'persist' => null,
@@ -9,6 +9,8 @@
     'context' => 'false',
     'blueprint' => true,
     'workbench' => true,
+    'workbenchActive' => false,
+    'blueprintActive' => false,
     'expandable' => false,
 ])
 
@@ -16,6 +18,7 @@
 
     $initial = $open ?? $current ? 'true' : 'false';
     $hasContent = $expandable;
+    $isNavigable = filled($href);
 
     $openExpr = $persist ? '$persist(' . $initial . ').as(\'' . $persist . '\')' : $initial;
 
@@ -30,9 +33,9 @@
 <div x-data="{{ $xData }}" x-init="$nextTick(() => requestAnimationFrame(() => ready = true))" x-on:dragenter="{{ $onEnter }}"
     x-on:dragleave="{{ $onLeave }}"
     {{ $attributes->class([
-        'group/branch rounded-sm p-1 border hover:bg-white dark:hover:bg-zinc-800/50 dark:hover:border-zinc-50/15',
-        'bg-white/50 dark:bg-zinc-800/30 border-zinc-200/80 dark:border-zinc-50/5' => !$current,
-        'bg-white border-zinc-200 dark:bg-zinc-800/50 dark:border-zinc-50/15' => $current,
+        'group/branch rounded-sm p-1 border hover:bg-white hover:border-zinc-900/20 dark:hover:bg-zinc-800/60 dark:hover:border-zinc-50/10',
+        'bg-white/50 dark:bg-zinc-800/20 border-zinc-900/10 dark:border-zinc-50/5' => !$current,
+        'bg-white border-zinc-900/20 dark:bg-zinc-800/60 dark:border-zinc-50/10' => $current,
     ]) }}>
 
     <div wire:key="item-{{ $item->id }}" wire:sort:item="{{ $item->id }}" class="flex items-center gap-1 text-sm ">
@@ -44,26 +47,25 @@
             @if ($context)
                 <x-ui.context-menu>
             @endif
-            <div x-on:click="
-                    if ($event.target.closest('button')) return;
-                    {{ $hasContent ? 'open = true;' : '' }}
-                    Livewire.navigate('{{ $href }}')
-                "
-                wire:navigate draggable="false" x-on:click="{{ $hasContent ? 'open = true' : '' }}"
-                class="font-display font-medium text-zinc-600 dark:text-zinc-50/70 group-hover/branch:text-zinc-700 dark:group-hover/branch:text-zinc-50 tracking-tight flex items-center gap-1 cursor-pointer">
+            <div @if ($isNavigable) x-on:click="
+                        if ($event.target.closest('a, button')) return;
+                        Livewire.navigate('{{ $href }}')
+                    " @endif
+                draggable="false"
+                class="font-display font-medium text-zinc-600 dark:text-zinc-50/70 group-hover/branch:text-zinc-700 dark:group-hover/branch:text-zinc-50 tracking-tight flex items-center gap-1 {{ $isNavigable ? 'cursor-pointer' : 'cursor-default' }}">
 
                 {{ $label }}
                 <flux:spacer />
                 <div class="flex items-center gap-1">
                     @if ($workbench)
-                        <flux:button href="{{ route('workbench', [$item->id, $item->workbench->id]) }}"
-                            icon="pencil-ruler" size="xs" variant="filled" color="{{ $color }}">
+                        <flux:button :href="$workbenchActive ? null : route('workbench', $item)" :disabled="$workbenchActive" icon="pencil-ruler" size="xs"
+                            variant="filled" color="{{ $color }}">
                             {{ $item->workbench_tasks_count }}
                         </flux:button>
                     @endisset
                     @if ($blueprint)
-                        <flux:button href="{{ route('blueprint', $item->id) }}" size="xs"
-                            icon="square-dashed-text" variant="filled" color="{{ $color }}">
+                        <flux:button :href="$blueprintActive ? null : route('blueprint', $item)" :disabled="$blueprintActive" size="xs" icon="drafting-compass"
+                            variant="filled" color="{{ $color }}">
                         </flux:button>
                     @endisset
         </div>

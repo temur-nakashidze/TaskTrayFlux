@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Models\Task;
 use App\Models\Tray;
 use Flux\Flux;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
@@ -52,30 +53,43 @@ new class extends Component
     #[Computed]
     public function projects()
     {
-        return Project::query()
+        return auth()->user()->projects()
             ->ordered()
-            ->with(['trays' => fn ($q) => $q->ordered()])
+            ->with([
+                'trays' => fn ($q) => $q->ordered(),
+                'shelves' => fn ($q) => $q->ordered(),
+            ])
             ->withCount('workbenchTasks')
             ->get();
     }
 
     public function moveProject(int $id, int $position): void
     {
-        Project::findOrFail($id)->moveToPosition($position);
+        auth()->user()->projects()->findOrFail($id)->moveToPosition($position);
     }
 
-    public function moveTray(int $id, int $position): void
+    public function moveShelf(int $id, int $position): void
     {
-        Tray::findOrFail($id)->moveToPosition($position);
+        $project = auth()->user()
+            ->projects()
+            ->whereHas('shelves', fn (Builder $query) => $query->whereKey($id))
+            ->firstOrFail();
+
+        $project->shelves()->findOrFail($id)->moveToPosition($position, 'asc');
     }
 
     public function moveTask(int $id, int $position, int $trayId): void
     {
-        $tray = Tray::findOrFail($trayId);
-        $task = Task::findOrFail($id);
+        $user = auth()->user();
+        $tray = Tray::query()->forUser($user)->findOrFail($trayId);
+        $task = Task::query()->where('user_id', $user->id)->findOrFail($id);
 
         DB::transaction(function () use ($task, $tray) {
-            $projectId = $tray->trayable_id; // trays are polymorphic, there is no project_id
+            $projectId = match (true) {
+                $tray->trayable instanceof Project => $tray->trayable->id,
+                $tray->trayable instanceof Shelf => $tray->trayable->project_id,
+                default => abort(404),
+            };
 
             if ($task->project_id !== $projectId) {
                 if ($task->workbenchReference) {
@@ -100,7 +114,9 @@ new class extends Component
     #[Computed]
     public function deleting(): ?Project
     {
-        return $this->selectedId ? Project::withCount(['trays', 'tasks'])->find($this->selectedId) : null;
+        return $this->selectedId
+            ? auth()->user()->projects()->withCount(['trays', 'tasks'])->find($this->selectedId)
+            : null;
     }
 
     public function createProject()
@@ -119,6 +135,7 @@ new class extends Component
 
     public function setProject(Project $project)
     {
+        $project = auth()->user()->projects()->findOrFail($project->getKey());
         $this->selectedId = $project->id;
         $this->projectName = $project->name;
         $this->projectColor = $project->color->value;
@@ -127,7 +144,7 @@ new class extends Component
 
     public function editProject(): void
     {
-        $project = Project::findOrFail($this->selectedId);
+        $project = auth()->user()->projects()->findOrFail($this->selectedId);
         app(UpdateProject::class)->handle($project, $this->projectName, $this->projectColor);
         $this->modal('edit-project')->close();
         $this->dispatch('project-updated');
@@ -135,6 +152,7 @@ new class extends Component
 
     public function confirmDelete(int $id, bool $current = false): void
     {
+        auth()->user()->projects()->findOrFail($id);
         $this->selectedId = $id;
         $this->deletingCurrent = $current;
         $this->modal('delete-project')->show();
@@ -142,7 +160,7 @@ new class extends Component
 
     public function deleteProject()
     {
-        $project = Project::findOrFail($this->selectedId);
+        $project = auth()->user()->projects()->findOrFail($this->selectedId);
 
         app(DeleteProject::class)->handle($project);
 
@@ -160,6 +178,7 @@ new class extends Component
 
     public function addBlueprint(Project $project)
     {
+        $project = auth()->user()->projects()->findOrFail($project->getKey());
         app(CreateBlueprint::class)->handle($project);
     }
 
@@ -186,16 +205,18 @@ new class extends Component
 
 
             <div wire:sort="moveProject" wire:sort:group="projects" class="space-y-2">
-                @foreach ($this->projects as $project)
+                @forelse ($this->projects as $project)
                     @php
                         $isCurrent =
-                            in_array($routeName, ['project', 'workbench'], true) &&
+                            in_array($routeName, ['project', 'workbench', 'blueprint', 'shelf'], true) &&
                             $routeProjectId === (int) $project->getKey();
                     @endphp
 
 
-                    <x-ui.sidebar-branch :handle="true" :href="route('project', $project)" :current="$isCurrent"
+                    <x-ui.sidebar-branch :handle="true" :href="$isCurrent ? null : route('project', $project)" :current="$isCurrent"
                         color="{{ $project->color }}" :item="$project" :workbench="$project->workbench()->exists()" :blueprint="$project->blueprint()->exists()"
+                        :workbench-active="$isCurrent && $routeName === 'workbench'"
+                        :blueprint-active="$isCurrent && $routeName === 'blueprint'"
                         :expandable="$project->shelves()->exists()" context>
                         <x-slot:label>
                             {{ $project->name }}
@@ -216,7 +237,7 @@ new class extends Component
                         </x-slot:context-menu>
 
                         @if ($project->shelves()->exists())
-                            <div wire:sort="moveTray" wire:sort:group="sidebar-trays-{{ $project->id }}"
+                            <div wire:sort="moveShelf" wire:sort:group="sidebar-trays-{{ $project->id }}"
                                 class="mt-2 space-y-1.5 mb-1">
                                 @foreach ($project->shelves as $shelf)
                                     <div wire:key="sidebar-shelf-{{ $shelf->id }}"
@@ -236,7 +257,16 @@ new class extends Component
                             </div>
                         @endif
                     </x-ui.sidebar-branch>
-                @endforeach
+                @empty
+                    <x-ui.empty-state icon="panels-top-left" heading="No projects yet"
+                        description="Create a project to start organizing your trays and tasks." class="py-6">
+                        <x-slot:action>
+                            <flux:modal.trigger name="add-project">
+                                <flux:button icon="plus" size="sm" variant="filled">Create project</flux:button>
+                            </flux:modal.trigger>
+                        </x-slot:action>
+                    </x-ui.empty-state>
+                @endforelse
             </div>
         </flux:sidebar.group>
     </flux:sidebar.nav>

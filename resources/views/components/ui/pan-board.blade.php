@@ -4,16 +4,14 @@
     fadeL: false,
     fadeR: false,
     updateFades() {
-        const el = this.$refs.fadeBoard
+        const el = this.$el.closest('.pin-board')?.querySelector('.pan-board')
+        if (!el) return
         this.fadeL = el.scrollLeft > 1
         this.fadeR = el.scrollLeft + el.clientWidth < el.scrollWidth - 1
     },
-}" x-init="const el = $refs.fadeBoard
-new ResizeObserver(() => updateFades()).observe(el)
-new MutationObserver(() => updateFades()).observe(el, { childList: true })
-updateFades()">
+}">
 
-    <div x-ref="fadeBoard" x-data="panBoard" x-init="const ro = new ResizeObserver(() => updateFades())
+    <div x-data="panBoard" x-init="const ro = new ResizeObserver(() => updateFades())
     const watch = () => {
         ro.observe($el);
         [...$el.children].forEach(c => ro.observe(c))
@@ -24,8 +22,6 @@ updateFades()">
         updateFades()
     }).observe($el, { childList: true })
     
-    updateFades()
-    requestAnimationFrame(() => updateFades())
     setTimeout(() => updateFades(), 300)" x-on:load.window="updateFades()"
         x-on:livewire:navigated.window="$nextTick(() => updateFades())" x-on:scroll.passive="updateFades()"
         x-on:pointerdown="down($event)" x-on:pointermove.window="move($event)" x-on:pointerup.window="up()"

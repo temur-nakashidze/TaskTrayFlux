@@ -25,19 +25,32 @@
     isEmpty: true,
     bump: false,
     focused: false,
+    off: null,
+    init() {
+        const el = this.$refs.textarea;
+        if (el?.value.trim()) {
+            this.isEmpty = false;
+            if (document.readyState === 'complete') this.resize();
+            else window.addEventListener('load', () => this.resize(), { once: true });
+        }
+        this.off = Livewire.hook('commit', ({ succeed }) =>
+            succeed(() => this.$nextTick(() => this.resize()))
+        );
+    },
+    destroy() {
+        this.off?.();
+    },
     resize() {
         const el = this.$refs.textarea;
+        if (!el) return;
         this.isEmpty = !el.value.trim();
 
-        el.style.height = 'auto'; // natural height = `rows` lines
-        if (el.scrollHeight > el.clientHeight) { // only when the text no longer fits
+        el.style.height = 'auto';
+        if (el.scrollHeight > el.clientHeight) {
             el.style.height = (el.scrollHeight + el.offsetHeight - el.clientHeight) + 'px';
         }
     }
-}" x-init="isEmpty = !$refs.textarea.value.trim();
-if (!isEmpty) resize();
-Livewire.hook('commit', ({ succeed }) => succeed(() => $nextTick(() => resize())));"
-    class="relative bg-zinc-600/5 dark:bg-zinc-900/40 rounded-sm pt-2 pb-1.5">
+}" class="relative bg-zinc-600/5 dark:bg-zinc-900/40 rounded-sm pt-2 pb-1.5">
 
 
 

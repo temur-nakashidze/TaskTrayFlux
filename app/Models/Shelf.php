@@ -18,6 +18,11 @@ class Shelf extends Model implements HasTrays
     use HasPosition;
     use SoftDeletes;
 
+    public function positionGroupColumns(): array
+    {
+        return ['project_id'];
+    }
+
     public function owningProject(): Project
     {
         return $this->project;

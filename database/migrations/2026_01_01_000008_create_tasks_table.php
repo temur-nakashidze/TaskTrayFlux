@@ -25,11 +25,6 @@ return new class extends Migration
                 ->nullable()
                 ->constrained()
                 ->nullOnDelete();
-            $table
-                ->foreignId('shelf_id')
-                ->nullable()
-                ->constrained()
-                ->nullOnDelete();
             $table->text('title');
             $table->text('note')->nullable();
             $table->timestamp('completed_at')->nullable();
@@ -44,7 +39,7 @@ return new class extends Migration
             // since these are soft deletes, not hard deletes.
             $table->index(['user_id', 'project_id']);
             $table->index(['project_id', 'tray_id', 'position']);
-            $table->index(['user_id', 'completed']);
+            $table->index(['user_id', 'completed_at']);
         });
     }
 

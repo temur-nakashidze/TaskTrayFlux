@@ -48,6 +48,15 @@ new class extends Component
             ->all();
     }
 
+    #[Computed]
+    public function dropzoneTaskCount(): int
+    {
+        return Task::query()
+            ->where('user_id', auth()->id())
+            ->inDropzone()
+            ->count();
+    }
+
     public function render()
     {
         return $this->view()->title('Drop Zone');

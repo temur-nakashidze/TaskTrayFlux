@@ -6,11 +6,13 @@ use App\Models\Tray;
 use Flux\Flux;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 new class extends Component
 {
+    #[Locked]
     public ?int $trayId = null;
 
     public array $selected = [];
@@ -18,7 +20,9 @@ new class extends Component
     #[On('open-tray-trash')]
     public function open(int $trayId): void
     {
-        $this->trayId = $trayId;
+        $tray = Tray::query()->forUser(auth()->user())->findOrFail($trayId);
+
+        $this->trayId = $tray->id;
         $this->selected = [];
 
         Flux::modal('tray-trash')->show();
@@ -33,7 +37,7 @@ new class extends Component
     public function tray(): ?Tray
     {
         return $this->trayId
-            ? Tray::query()->whereKey($this->trayId)->first() // scope to the user's/project's trays here
+            ? Tray::query()->forUser(auth()->user())->find($this->trayId)
             : null;
     }
 
@@ -43,18 +47,18 @@ new class extends Component
         return $this->tray ? $this->tray->tasks()->onlyTrashed()->get() : collect();
     }
 
-    public function restore(RestoreTasks $action)
+    public function restore(RestoreTasks $action): void
     {
-        $action->handle($this->tray, $this->selected);
+        $action->handle($this->tray ?? abort(404), $this->selected);
         $this->reset('selected');
         unset($this->trashedTasks);
 
         $this->dispatch('tasks-restored');
     }
 
-    public function forceDelete(ForceDeleteTasks $action)
+    public function forceDelete(ForceDeleteTasks $action): void
     {
-        $action->handle($this->tray, $this->selected);
+        $action->handle($this->tray ?? abort(404), $this->selected);
         $this->reset('selected');
         unset($this->trashedTasks);
     }
@@ -68,12 +72,17 @@ new class extends Component
                 <flux:heading size="lg">Trashed Tsks</flux:heading>
             </div>
 
-            <flux:checkbox.group variant="cards" wire:model.live="selected" class="flex-col text-zinc-600!">
-                <flux:checkbox.all label="select all" />
-                @foreach ($this->trashedTasks as $trashedTask)
-                    <flux:checkbox value="{{ $trashedTask->id }}" label="{{ $trashedTask->title }}" />
-                @endforeach
-            </flux:checkbox.group>
+            @if ($this->trashedTasks->isEmpty())
+                <x-ui.empty-state icon="trash" heading="No deleted tasks"
+                    description="Tasks deleted from this tray will appear here." />
+            @else
+                <flux:checkbox.group variant="cards" wire:model.live="selected" class="flex-col text-zinc-600!">
+                    <flux:checkbox.all label="select all" />
+                    @foreach ($this->trashedTasks as $trashedTask)
+                        <flux:checkbox value="{{ $trashedTask->id }}" label="{{ $trashedTask->title }}" />
+                    @endforeach
+                </flux:checkbox.group>
+            @endif
             <div class="flex gap-2">
                 <flux:spacer />
                 <flux:modal.close>

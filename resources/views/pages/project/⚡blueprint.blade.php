@@ -19,11 +19,12 @@ new class extends Component
 
     public function mount(Project $project)
     {
-        $this->project = $project;
-        if (! $project->blueprint) {
+        $this->project = auth()->user()->projects()->findOrFail($project->getKey());
+
+        if (! $this->project->blueprint) {
             redirect('dashboard');
         }
-        $blueprint = $project->blueprint;
+        $blueprint = $this->project->blueprint;
         $this->blueprint = $blueprint;
 
         $this->blueprintText = $blueprint->text;

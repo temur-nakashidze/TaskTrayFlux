@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 // Route::view('/', 'welcome')->name('home');
 
 Route::middleware(['auth'])->group(function () {
+    Route::livewire('/', 'pages::dropzone.index')->name('dashboard');
     Route::livewire('/dashboard', 'pages::dropzone.index')->name('dashboard');
     Route::livewire('/project/{project}', 'pages::project.index')->name('project');
     Route::livewire('/project/{project}/workbench', 'pages::workbench.index')->name('workbench');

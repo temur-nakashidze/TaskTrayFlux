@@ -18,7 +18,6 @@ trait ManagesTasks
     public function completeTask(int $taskId): void
     {
         $task = $this->taskScope()->findOrFail($taskId);
-
         app(CompleteTask::class)->handle($task, auth()->user());
         $this->afterTaskChange();
     }

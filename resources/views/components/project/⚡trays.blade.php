@@ -38,18 +38,18 @@ new class extends Component
 
     protected function taskScope(): Builder
     {
-        return $this->owner->tasks()->getQuery();
-    }
-
-    protected function pullableTasks(): Builder
-    {
-        return $this->project->tasks()->notOnWorkbench()->getQuery();
+        return $this->owner->tasks()->getQuery()->select('tasks.*');
     }
 
     #[Computed]
     public function project(): Project
     {
         return $this->owner->owningProject();
+    }
+
+    protected function pullableTasks(): Builder
+    {
+        return $this->project->tasks()->notOnWorkbench()->getQuery();
     }
 
     protected function trayOwner(): Model&HasTrays
@@ -64,7 +64,6 @@ new class extends Component
             ->trays()
             ->ordered('asc')
             ->with([
-                'tasks' => fn ($q) => $q->ordered()->with('cuts', 'tags'),
                 'completedTasks' => fn ($q) => $q->ordered()->with('cuts', 'tags'),
                 'activeTasks' => fn ($q) => $q->ordered()->with('cuts', 'tags', 'workbenchReference'),
             ])
@@ -80,16 +79,17 @@ new class extends Component
         app(CreateTask::class)->handle(auth()->user(), $title, tray: $tray, project: $this->project, tags: $tags);
     }
 
-    public function redactingNote(Task $task)
+    public function redactingNote(Task $task): void
     {
+        $task = $this->taskScope()->findOrFail($task->getKey());
         $this->selectedTask = $task->id;
         $this->taskNote = $task->note;
         $this->modal('update-note')->show();
     }
 
-    public function updateNote()
+    public function updateNote(): void
     {
-        $task = Task::findOrFail($this->selectedTask);
+        $task = $this->taskScope()->findOrFail($this->selectedTask);
         $note = $this->taskNote;
         $task->update(['note' => $note]);
         $this->modal('update-note')->close();
@@ -116,7 +116,7 @@ new class extends Component
 
     public function removeTaskFromWorkbench(int $taskId): void
     {
-        $task = Task::findOrFail($taskId);
+        $task = $this->taskScope()->findOrFail($taskId);
         app(RemoveTaskFromWorkbench::class)->handle($task->id);
         $this->dispatch('workbench-updated');
     }
@@ -150,44 +150,53 @@ new class extends Component
     <x-ui.pan-board name="trays" wire:sort="moveTray" wire:transition wire:sort:group="trays"
         class="w-full h-[calc(100vh-12rem)] pb-2" scroll-on="tray-added">
 
-        @foreach ($this->trays as $tray)
-            <x-project.tray :tray="$tray" wire:key="trays-tray-{{ $tray->id }}"
-                x-sort:item="{{ $tray->id }}" badgeColor="{{ $owner->color }}">
-                <div wire:sort="moveTask" wire:sort:group="tray" wire:sort:group-id="{{ $tray->id }}"
-                    class="space-y-2 flex-1 min-h-0 overflow-y-auto overflow-x-hidden  px-1 -mx-1">
-                    @foreach ($tray->activeTasks as $task)
-                        <x-project.task :task="$task" toggleColor="{{ $owner->color }}"
-                            wire:key="active-task-{{ $task->id }}" :tags="$task->tags"
-                            wire:sort:item="{{ $task->id }}">
-                            <x-slot:actions>
-                                <flux:button.group>
-                                    <flux:button variant="filled" wire:click="completeTask({{ $task->id }})"
-                                        icon="check" size="sm" />
-                                    <flux:toggle icon="wrench" size="sm" class="rounded-l-none" variant="filled"
-                                        icon="wrench-screwdriver" color="{{ $owner->color }}"
-                                        x-on:change="$wire.toggleWorkbenchTask({{ $task->id }})"
-                                        :checked="$task->workbenchReference" />
-                                </flux:button.group>
-                            </x-slot:actions>
-                        </x-project.task>
-                    @endforeach
-                    <x-slot:completed>
-                        @foreach ($tray->completedTasks as $task)
-                            <x-project.task :task="$task" toggleColor="{{ $owner->color }}" completed
-                                wire:transition wire:key="completed-task-{{ $task->id }}" :tags="$task->tags"
-                                wire:sort:item="{{ $task->id }}" class="" :completed="true"
-                                :context="true">
+        @if ($this->trays->isEmpty())
+            <x-ui.empty-state icon="archive-box" heading="No trays yet"
+                description="Add a tray to start organizing tasks in this project.">
+                <x-slot:action>
+                    <flux:button wire:click="addTray" icon="plus" size="sm" variant="filled">Add first tray</flux:button>
+                </x-slot:action>
+            </x-ui.empty-state>
+        @else
+            @foreach ($this->trays as $tray)
+                <x-project.tray :tray="$tray" wire:key="trays-tray-{{ $tray->id }}"
+                    x-sort:item="{{ $tray->id }}" badgeColor="{{ $this->project->color }}">
+                    <div wire:sort="moveTask" wire:sort:group="tray" wire:sort:group-id="{{ $tray->id }}"
+                        class="space-y-2 flex-1 min-h-0 overflow-y-auto overflow-x-hidden  px-1 -mx-1">
+                        @foreach ($tray->activeTasks as $activeTask)
+                            <x-project.task :task="$activeTask" toggleColor="{{ $owner->color }}"
+                                wire:key="active-task-{{ $activeTask->id }}" :tags="$activeTask->tags"
+                                wire:sort:item="{{ $activeTask->id }}">
                                 <x-slot:actions>
-                                    <flux:button variant="filled" icon="arrow-uturn-up"
-                                        x-on:click="$wire.restoreTask({{ $task->id }})" iconVariant="outline"
-                                        size="sm" />
+                                    <flux:button.group>
+                                        <flux:button variant="filled" wire:click="completeTask({{ $activeTask->id }})"
+                                            icon="check" size="sm" />
+                                        <flux:toggle icon="wrench" size="sm" class="rounded-l-none" variant="filled"
+                                            icon="wrench-screwdriver" color="{{ $this->project->color }}"
+                                            x-on:change="$wire.toggleWorkbenchTask({{ $activeTask->id }})"
+                                            :checked="$activeTask->workbenchReference" />
+                                    </flux:button.group>
                                 </x-slot:actions>
                             </x-project.task>
                         @endforeach
-                    </x-slot:completed>
-                </div>
-            </x-project.tray>
-        @endforeach
+                        <x-slot:completed>
+                            @foreach ($tray->completedTasks as $completedTask)
+                                <x-project.task :task="$completedTask" completed wire:transition
+                                    wire:key="completed-task-{{ $completedTask->id }}" :tags="$completedTask->tags"
+                                    wire:sort:item="{{ $completedTask->id }}" class="" :completed="true"
+                                    :context="true">
+                                    <x-slot:actions>
+                                        <flux:button variant="filled" icon="arrow-uturn-up"
+                                            x-on:click="$wire.restoreTask({{ $completedTask->id }})"
+                                            iconVariant="outline" size="sm" />
+                                    </x-slot:actions>
+                                </x-project.task>
+                            @endforeach
+                        </x-slot:completed>
+                    </div>
+                </x-project.tray>
+            @endforeach
+        @endif
     </x-ui.pan-board>
     <flux:modal name="update-note" class="min-w-100">
         <div class="space-y-6">

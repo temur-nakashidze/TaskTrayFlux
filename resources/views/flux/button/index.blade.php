@@ -62,7 +62,7 @@
 
     $isColored =
         $color &&
-        in_array($variant, ['filled', 'outline', 'ghost', 'subtle'], true) &&
+        in_array($variant, ['filled', 'filled-bordered', 'outline', 'ghost', 'subtle'], true) &&
         !in_array($color, ['slate', 'gray', 'zinc', 'neutral', 'stone', 'mauve', 'olive', 'mist', 'taupe'], true);
 
     $classes = Flux::classes()
@@ -81,7 +81,7 @@
             match (
                 $size // Size...
             ) {
-                'base' => 'h-10 text-sm rounded-lg gap-2' .
+                'base' => 'h-10 text-sm rounded-md gap-2' .
                     ' ' .
                     ($square
                         ? 'w-10'
@@ -89,14 +89,14 @@
                             ($iconLeading && $iconLeading !== '' ? 'ps-3' : 'ps-4') .
                             ' ' .
                             ($iconTrailing && $iconTrailing !== '' ? 'pe-3' : 'pe-4')),
-                'sm' => 'h-8 text-sm rounded-md gap-2' .
+                'sm' => 'h-8 text-sm rounded-sm gap-2' .
                     ' ' .
                     ($square
                         ? 'w-8'
                         : ($iconLeading && $iconLeading !== '' ? 'ps-2' : 'ps-3') .
                             ' ' .
                             ($iconTrailing && $iconTrailing !== '' ? 'pe-2' : 'pe-3')),
-                'xs' => 'h-6 text-xs rounded-md gap-1' .
+                'xs' => 'h-6 text-xs rounded-sm gap-1' .
                     ' ' .
                     ($square
                         ? 'w-6'
@@ -145,7 +145,7 @@
             match (
                 true // Background color...
             ) {
-                $isColored && $variant === 'filled'
+                $isColored && in_array($variant, ['filled', 'filled-bordered'], true)
                     => 'bg-[color-mix(in_oklab,_var(--color-button-soft),_transparent_80%)] hover:bg-[color-mix(in_oklab,_var(--color-button-soft),_transparent_70%)] dark:bg-[color-mix(in_oklab,_var(--color-button-soft),_transparent_60%)] dark:hover:bg-[color-mix(in_oklab,_var(--color-button-soft),_transparent_50%)]',
                 $isColored && $variant === 'outline'
                     => 'bg-white hover:bg-[color-mix(in_oklab,_var(--color-button-soft)_6%,_white)] dark:bg-zinc-700 dark:hover:bg-[color-mix(in_oklab,_var(--color-accent-content)_10%,_var(--color-zinc-700))]',
@@ -156,7 +156,9 @@
                 default => match ($variant) {
                     'primary'
                         => 'bg-[var(--color-accent)] hover:bg-[color-mix(in_oklab,_var(--color-accent),_transparent_10%)]',
-                    'filled' => 'bg-zinc-800/5 hover:bg-zinc-800/10 dark:bg-white/10 dark:hover:bg-white/20',
+                    'filled',
+                    'filled-bordered'
+                        => 'bg-zinc-800/5 hover:bg-zinc-800/10 dark:bg-white/10 dark:hover:bg-white/20',
                     'outline' => 'bg-white hover:bg-zinc-50 dark:bg-zinc-700 dark:hover:bg-zinc-600/75',
                     'danger' => 'bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-500',
                     'ghost' => 'bg-transparent hover:bg-zinc-800/5 dark:hover:bg-white/15',
@@ -168,7 +170,7 @@
             match (
                 true // Text color...
             ) {
-                $isColored && $variant === 'filled'
+                $isColored && in_array($variant, ['filled', 'filled-bordered'], true)
                     => 'text-(--color-button-strong) dark:text-(--color-button-soft-foreground)',
                 $isColored && $variant === 'outline'
                     => 'text-(--color-button-strong) dark:text-(--color-accent-content)',
@@ -177,7 +179,7 @@
                     => 'text-[color-mix(in_oklab,_var(--color-accent-content),_var(--color-zinc-500)_46%)] hover:text-(--color-button-strong) dark:text-[color-mix(in_oklab,_var(--color-button-muted),_var(--color-zinc-400)_48%)] dark:hover:text-(--color-button-muted)',
                 default => match ($variant) {
                     'primary' => 'text-[var(--color-accent-foreground)]',
-                    'filled' => 'text-zinc-600 dark:text-white',
+                    'filled', 'filled-bordered' => 'text-zinc-600 dark:text-white',
                     'outline' => 'text-zinc-700 dark:text-white',
                     'danger' => 'text-white',
                     'ghost' => 'text-zinc-700 dark:text-white',
@@ -191,10 +193,14 @@
             ) {
                 $isColored && $variant === 'outline'
                     => 'border border-[color-mix(in_oklab,_var(--color-button-border)_18%,_var(--color-zinc-200))] border-b-[color-mix(in_oklab,_color-mix(in_oklab,_var(--color-button-border)_26%,_var(--color-zinc-300))_80%,_transparent)] hover:border-[color-mix(in_oklab,_var(--color-button-border)_28%,_var(--color-zinc-200))] hover:border-b-[color-mix(in_oklab,_var(--color-button-border)_36%,_var(--color-zinc-200))] dark:border-[color-mix(in_oklab,_var(--color-accent-content)_22%,_var(--color-zinc-600))] dark:border-b-[color-mix(in_oklab,_var(--color-accent-content)_30%,_var(--color-zinc-600))] dark:hover:border-[color-mix(in_oklab,_var(--color-accent-content)_32%,_var(--color-zinc-600))] dark:hover:border-b-[color-mix(in_oklab,_var(--color-accent-content)_40%,_var(--color-zinc-600))]',
+                $isColored && $variant === 'filled-bordered'
+                    => 'border border-[color-mix(in_oklab,_var(--color-button-strong),_var(--color-button-tint)_55%)] hover:border-[color-mix(in_oklab,_var(--color-button-strong),_var(--color-button-tint)_26%)] dark:border-[color-mix(in_oklab,_var(--color-button-strong),_var(--color-button-tint)_22%)] dark:hover:border-[color-mix(in_oklab,_var(--color-button-strong),_var(--color-button-tint)_32%)]',
                 default => match ($variant) {
                     'primary' => 'border border-black/10 dark:border-0',
                     'outline'
                         => 'border border-zinc-200 hover:border-zinc-200 disabled:border-zinc-200 border-b-zinc-300/80 dark:border-zinc-600 dark:hover:border-zinc-600 dark:disabled:border-zinc-600',
+                    'filled-bordered'
+                        => 'border border-zinc-200/80 hover:border-zinc-300 dark:border-white/10 dark:hover:border-white/20',
                     default => '',
                 },
             },
@@ -221,6 +227,8 @@
                 'ghost' => '',
                 'subtle' => '',
                 'outline'
+                    => '[[data-flux-button-group]_&]:border-s-0 [:is([data-flux-button-group]>&:first-child,_[data-flux-button-group]_:first-child>&)]:border-s-[1px]',
+                'filled-bordered'
                     => '[[data-flux-button-group]_&]:border-s-0 [:is([data-flux-button-group]>&:first-child,_[data-flux-button-group]_:first-child>&)]:border-s-[1px]',
                 'filled'
                     => '[[data-flux-button-group]_&]:border-e [:is([data-flux-button-group]>&:last-child,_[data-flux-button-group]_:last-child>&)]:border-e-0 [[data-flux-button-group]_&]:border-zinc-200/80 dark:[[data-flux-button-group]_&]:border-zinc-900/50',

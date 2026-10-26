@@ -22,6 +22,7 @@ final class CompleteTask
                 $task->refresh();
             }
             $this->fold->handle($task);
+
             $task->workbenchTask?->delete();
 
             $now = now();

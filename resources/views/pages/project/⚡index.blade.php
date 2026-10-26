@@ -1,6 +1,5 @@
 <?php
 use App\Models\Project;
-use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -10,7 +9,7 @@ new class extends Component
 
     public function mount(Project $project): void
     {
-        $this->project = $project;
+        $this->project = auth()->user()->projects()->findOrFail($project->getKey());
     }
 
     #[On('tasks-moved')]
@@ -36,9 +35,6 @@ new class extends Component
         <flux:separator variant="muted" />
         <livewire:project.trays :owner="$this->project" />
 
-
         <livewire:project.tray-trash />
-        <livewire:project.log />
-        <x-project.settings />
     </div>
 </div>

@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
-use InvalidArgumentException;
 
 #[Table('workbenches')]
 class Workbench extends Model
@@ -41,7 +40,7 @@ class Workbench extends Model
 
     public function pull(Task $task, ?int $position = null): WorkbenchTask
     {
-        $this->guardPull($task);
+        $this->project()->firstOrFail()->tasks()->findOrFail($task->getKey());
 
         if (
             $existing = $this->workbenchTasks()
@@ -61,20 +60,5 @@ class Workbench extends Model
 
             return $reference;
         });
-    }
-
-    protected function guardPull(Task $task): void
-    {
-        // the task must be on this workbench's project board
-        $onBoard = Task::query()
-            ->whereKey($task->id)
-            ->whereHas('tray', fn ($q) => $q->inProject($this->project))
-            ->exists();
-
-        if (! $onBoard) {
-            throw new InvalidArgumentException(
-                "Task is not in this workbench's project.",
-            );
-        }
     }
 }

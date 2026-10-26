@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Concerns;
 
-use App\Models\Workbench;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -25,9 +24,11 @@ trait WithWorkbenchPulling
 
         // Gate::authorize('update', $task);  // when policies exist
 
-        // pull() rejects a task that is not on that workbench's project board,
-        // so a forged workbench id cannot be used to reach another project.
-        Workbench::findOrFail($workbenchId)->pull($task);
+        $task->project()
+            ->firstOrFail()
+            ->workbench()
+            ->findOrFail($workbenchId)
+            ->pull($task);
 
         $this->dispatch('workbench-updated');
     }
