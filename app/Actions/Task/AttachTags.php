@@ -21,7 +21,17 @@ final class AttachTags
             $name = mb_substr(trim($name), 0, 50);
 
             if ($name !== '') {
-                $ids->push($user->tags()->firstOrCreate(['name' => $name], ['color' => TagColor::random()])->id);
+                $tag = $user->tags()
+                    ->withTrashed()
+                    ->firstOrNew(['name' => $name], ['color' => TagColor::random()]);
+
+                if (! $tag->exists) {
+                    $tag->save();
+                } elseif ($tag->trashed()) {
+                    $tag->restore();
+                }
+
+                $ids->push($tag->id);
             }
         }
 

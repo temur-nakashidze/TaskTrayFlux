@@ -6,7 +6,7 @@
             </flux:button>
         </flux:card.actions>
     </flux:card.header>
-    <div wire:sort="moveTask" class="space-y-1">
+    <div wire:sort="moveTask" wire:sort:config="{ forceFallback: true }" class="space-y-1">
         @if ($this->completedTasks->isEmpty())
             <x-ui.empty-state heading="No completed tasks yet"
                 description="Tasks you finish on the Workbench will appear here." />

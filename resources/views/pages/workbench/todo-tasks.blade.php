@@ -8,7 +8,7 @@
         <flux:card.actions>
         </flux:card.actions>
     </flux:card.header>
-    <div wire:sort="moveTask" class="space-y-1">
+    <div wire:sort="moveTask" wire:sort:config="{ forceFallback: true }" class="space-y-1">
         @if ($this->unplayedTasks->isEmpty())
             <x-ui.empty-state heading="Nothing to do yet"
                 description="Tasks you add to the Workbench will appear here before you start them." />

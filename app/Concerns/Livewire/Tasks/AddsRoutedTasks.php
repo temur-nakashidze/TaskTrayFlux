@@ -33,5 +33,6 @@ trait AddsRoutedTasks
         app(CreateTask::class)->handle($user, $title, tray: $tray, project: $project, tags: $tags);
 
         $this->dispatch('tasks-moved');
+        $this->dispatch('tags-updated');
     }
 }

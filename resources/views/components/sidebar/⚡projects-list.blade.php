@@ -53,7 +53,9 @@ new class extends Component
     #[Computed]
     public function projects()
     {
-        return auth()->user()->projects()
+        return auth()
+            ->user()
+            ->projects()
             ->ordered()
             ->with([
                 'trays' => fn ($q) => $q->ordered(),
@@ -68,12 +70,20 @@ new class extends Component
         auth()->user()->projects()->findOrFail($id)->moveToPosition($position);
     }
 
+    public function projectInitials(string $name): string
+    {
+        $words = preg_split('/\s+/u', trim($name), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+
+        if (count($words) > 1) {
+            return mb_strtoupper(mb_substr($words[0], 0, 1).mb_substr($words[1], 0, 1));
+        }
+
+        return mb_strtoupper(mb_substr($words[0] ?? '', 0, 2));
+    }
+
     public function moveShelf(int $id, int $position): void
     {
-        $project = auth()->user()
-            ->projects()
-            ->whereHas('shelves', fn (Builder $query) => $query->whereKey($id))
-            ->firstOrFail();
+        $project = auth()->user()->projects()->whereHas('shelves', fn (Builder $query) => $query->whereKey($id))->firstOrFail();
 
         $project->shelves()->findOrFail($id)->moveToPosition($position, 'asc');
     }
@@ -115,7 +125,11 @@ new class extends Component
     public function deleting(): ?Project
     {
         return $this->selectedId
-            ? auth()->user()->projects()->withCount(['trays', 'tasks'])->find($this->selectedId)
+            ? auth()
+                ->user()
+                ->projects()
+                ->withCount(['trays', 'tasks'])
+                ->find($this->selectedId)
             : null;
     }
 
@@ -196,15 +210,24 @@ new class extends Component
             wire:navigate>
             Dropzone
         </flux:sidebar.item>
-        <flux:sidebar.group :heading="__('Projects')" x-data="newProject({{ \Illuminate\Support\Js::from($this->templates) }})" class="grid mt-4 relative group/sidebar-group">
+        <flux:separator variant="subtle" class="mx-3 my-2" />
 
-            <flux:modal.trigger name="add-project">
-                <flux:button icon="plus" variant="ghost" size="xs" aria-label="New project"
-                    class="absolute! right-0 top-1 opacity-0 focus:opacity-100 group-hover/sidebar-group:opacity-100" />
-            </flux:modal.trigger>
+        <div x-data="newProject({{ \Illuminate\Support\Js::from($this->templates) }})" class="grid group/sidebar-group">
+            <div class="mb-1 flex items-center justify-between px-3 in-data-flux-sidebar-collapsed-desktop:hidden">
+                <flux:heading size="sm" class="font-medium text-zinc-500 dark:text-zinc-400">{{ __('Projects') }}</flux:heading>
+                <flux:modal.trigger name="add-project">
+                    <flux:button icon="plus" variant="ghost" size="xs" aria-label="New project"
+                        class="opacity-0 focus:opacity-100 group-hover/sidebar-group:opacity-100" />
+                </flux:modal.trigger>
+            </div>
 
+            <div class="mb-1 hidden justify-center in-data-flux-sidebar-collapsed-desktop:flex">
+                <flux:modal.trigger name="add-project">
+                    <flux:button icon="plus" variant="ghost" size="sm" square aria-label="New project" title="New project" />
+                </flux:modal.trigger>
+            </div>
 
-            <div wire:sort="moveProject" wire:sort:group="projects" class="space-y-2">
+            <div wire:sort="moveProject" wire:sort:config="{ forceFallback: true }" wire:sort:group="projects" class="space-y-2">
                 @forelse ($this->projects as $project)
                     @php
                         $isCurrent =
@@ -213,10 +236,12 @@ new class extends Component
                     @endphp
 
 
-                    <x-ui.sidebar-branch :handle="true" :href="$isCurrent ? null : route('project', $project)" :current="$isCurrent"
-                        color="{{ $project->color }}" :item="$project" :workbench="$project->workbench()->exists()" :blueprint="$project->blueprint()->exists()"
-                        :workbench-active="$isCurrent && $routeName === 'workbench'"
-                        :blueprint-active="$isCurrent && $routeName === 'blueprint'"
+                    <x-ui.sidebar-branch :handle="true" :href="$isCurrent ? null : route('project', $project)"
+                        :compact-href="route('project', $project)" :compact-label="$this->projectInitials($project->name)"
+                        :compact-title="$project->name"
+                        :compact-color="$project->color->bg().' '.$project->color->border().' '.$project->color->text()"
+                        :current="$isCurrent"
+                        color="{{ $project->color }}" :item="$project" :workbench="$project->workbench()->exists()" :workbench-active="$isCurrent && $routeName === 'workbench'"
                         :expandable="$project->shelves()->exists()" context>
                         <x-slot:label>
                             {{ $project->name }}
@@ -237,7 +262,7 @@ new class extends Component
                         </x-slot:context-menu>
 
                         @if ($project->shelves()->exists())
-                            <div wire:sort="moveShelf" wire:sort:group="sidebar-trays-{{ $project->id }}"
+                            <div wire:sort="moveShelf" wire:sort:config="{ forceFallback: true }" wire:sort:group="sidebar-trays-{{ $project->id }}"
                                 class="mt-2 space-y-1.5 mb-1">
                                 @foreach ($project->shelves as $shelf)
                                     <div wire:key="sidebar-shelf-{{ $shelf->id }}"
@@ -259,7 +284,8 @@ new class extends Component
                     </x-ui.sidebar-branch>
                 @empty
                     <x-ui.empty-state icon="panels-top-left" heading="No projects yet"
-                        description="Create a project to start organizing your trays and tasks." class="py-6">
+                        description="Create a project to start organizing your trays and tasks."
+                        class="py-6 in-data-flux-sidebar-collapsed-desktop:hidden">
                         <x-slot:action>
                             <flux:modal.trigger name="add-project">
                                 <flux:button icon="plus" size="sm" variant="filled">Create project</flux:button>
@@ -268,7 +294,7 @@ new class extends Component
                     </x-ui.empty-state>
                 @endforelse
             </div>
-        </flux:sidebar.group>
+        </div>
     </flux:sidebar.nav>
 
 

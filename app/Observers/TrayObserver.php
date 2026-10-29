@@ -20,4 +20,9 @@ class TrayObserver
     {
         $tray->tasks()->onlyTrashed()->get()->each(fn ($task) => $task->restore());
     }
+
+    public function forceDeleting(Tray $tray): void
+    {
+        $tray->tasks()->withTrashed()->get()->each(fn ($task) => $task->forceDelete());
+    }
 }

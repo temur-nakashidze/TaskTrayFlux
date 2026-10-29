@@ -37,6 +37,8 @@ new class extends Component
     <div class="space-y-2 -mx-6 -mt-6">
         <livewire:project.trays :owner="$this->shelf" />
     </div>
+    <livewire:project.trays-trash />
+    <livewire:project.tray-trash />
 
 
 </div>

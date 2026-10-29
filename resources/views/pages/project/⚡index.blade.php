@@ -30,11 +30,12 @@ new class extends Component
 <div>
 
     <livewire:project.project-header :project="$this->project" />
-    <div class="space-y-2 -mx-6 -mt-6">
+    <div class="space-y-2 -mx-6 -mt-6 ">
         <livewire:project.shelves :project="$this->project" />
         <flux:separator variant="muted" />
         <livewire:project.trays :owner="$this->project" />
-
-        <livewire:project.tray-trash />
     </div>
+    <livewire:project.shelves-trash />
+    <livewire:project.trays-trash />
+    <livewire:project.tray-trash />
 </div>

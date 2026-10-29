@@ -74,9 +74,10 @@ new class extends Component
     <x-project.workbench-button :project="$project" :count="$this->workbenchTasksCount" :active="$onWorkbench" />
     <x-project.blueprint-button :project="$project" :active="$onBlueprint" />
     <div class="flex items-center gap-1 ml-2">
-        <flux:button icon="rotate-ccw-clock" variant="subtle" wire:click="$dispatch('open-project-log')" />
+        <flux:button icon="clock-counter-clockwise-ph-duotone" variant="subtle"
+            wire:click="$dispatch('open-project-log')" />
         <flux:modal.trigger name="project-settings">
-            <flux:button icon="cog-6-tooth" variant="subtle"></flux:button>
+            <flux:button icon="sliders-ph-duotone" variant="subtle"></flux:button>
         </flux:modal.trigger>
     </div>
 

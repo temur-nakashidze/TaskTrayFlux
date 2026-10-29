@@ -21,7 +21,10 @@
         "vite-plus": "1.4.0"
     },
     "devDependencies": {
-        "@tailwindcss/typography": "^0.5.20"
+        "@tailwindcss/typography": "^0.5.20",
+        "prettier": "^3.9.10",
+        "prettier-plugin-blade": "^3.3.3",
+        "prettier-plugin-tailwindcss": "^0.8.1"
     },
     "optionalDependencies": {
         "@laravel/multiplex": "^0.4.1",

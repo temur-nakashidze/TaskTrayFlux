@@ -4,7 +4,9 @@ namespace App\Models;
 
 use App\Concerns\HasPosition;
 use App\Contracts\HasTrays;
+use App\Observers\ShelfObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['name'])]
+#[ObservedBy([ShelfObserver::class])]
 class Shelf extends Model implements HasTrays
 {
     use HasPosition;

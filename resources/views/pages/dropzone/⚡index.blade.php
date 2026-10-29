@@ -5,6 +5,7 @@ use App\Enums\ProjectColor;
 use App\Enums\TagColor;
 use App\Models\Task;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 new class extends Component
@@ -55,6 +56,12 @@ new class extends Component
             ->where('user_id', auth()->id())
             ->inDropzone()
             ->count();
+    }
+
+    #[On('tags-updated')]
+    public function refreshTags(): void
+    {
+        unset($this->tagOptions);
     }
 
     public function render()

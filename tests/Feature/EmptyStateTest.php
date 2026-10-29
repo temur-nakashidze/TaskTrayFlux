@@ -33,14 +33,39 @@ test('empty project boards offer actions to create a tray and a shelf', function
     Livewire::test('project.trays', ['owner' => $project])
         ->assertSee('No trays yet')
         ->assertSee('Add first tray')
+        ->assertSee('items-center justify-center')
+        ->assertDontSee('Trays')
+        ->assertDontSee('Add Tray')
         ->call('addTray')
+        ->assertSee('Trays')
+        ->assertSee('Add Tray')
         ->assertDontSee('No trays yet');
 
     Livewire::test('project.shelves', ['project' => $project])
         ->assertSee('No shelves yet')
         ->assertSee('Add first shelf')
+        ->assertSee('items-center justify-center')
+        ->assertDontSee('Shelves')
+        ->assertDontSee('Add Shelf')
         ->call('addShelf')
+        ->assertSee('Shelves')
+        ->assertSee('Add Shelf')
         ->assertDontSee('No shelves yet');
+});
+
+test('empty trays show a task empty state without an action', function () {
+    $user = User::factory()->create();
+    $project = Project::factory()->create(['user_id' => $user->id]);
+    $tray = Tray::factory()->forProject($project)->create();
+
+    $this->actingAs($user);
+
+    Livewire::test('project.trays', ['owner' => $project])
+        ->assertSee('No tasks in this tray')
+        ->assertSee('Add Task')
+        ->assertSee('wire:sort:group="tray"', false)
+        ->assertSee('wire:sort:group-id="'.$tray->id.'"', false)
+        ->assertDontSee('Add first task');
 });
 
 test('the sidebar explains how to create the first project', function () {

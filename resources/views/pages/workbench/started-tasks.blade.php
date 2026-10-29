@@ -16,7 +16,7 @@
         </flux:card.actions>
     </flux:card.header>
 
-    <div wire:sort="moveTask" class="space-y-1">
+    <div wire:sort="moveTask" wire:sort:config="{ forceFallback: true }" class="space-y-1">
         @if ($this->playedTasks->isEmpty())
             <x-ui.empty-state heading="Nothing started yet"
                 description="Start a Workbench task to see it here." />

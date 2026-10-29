@@ -17,4 +17,10 @@ class TaskObserver
     {
         $task->cuts()->onlyTrashed()->get()->each(fn ($cut) => $cut->restore());
     }
+
+    public function forceDeleting(Task $task): void
+    {
+        $task->cuts()->withTrashed()->get()->each(fn ($cut) => $cut->forceDelete());
+        $task->workbenchReference()->get()->each(fn ($reference) => $reference->forceDelete());
+    }
 }
